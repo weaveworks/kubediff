@@ -51,7 +51,13 @@ def check_file(path):
   if options.kubeconfig is not None:
     args.append("--kubeconfig=%s" % options.kubeconfig)
 
-  running = subprocess.check_output(["kubectl", "get"] + args + [kind, name])
+  try:
+    running = subprocess.check_output(["kubectl", "get"] + args + [kind, name], stderr=subprocess.STDOUT)
+  except subprocess.CalledProcessError, e:
+    print " *** %s" % e.output
+    failed = True
+    return
+
   running = yaml.load(running)
 
   diff("", expected, running)
@@ -71,7 +77,7 @@ if __name__ == "__main__":
   parser.add_option("--kubeconfig", help="path to kubeconfig")
   (options, args) = parser.parse_args()
   if len(args) == 0:
-    parser.print_usage()
+    parser.print_help()
     sys.exit(1)
 
   for path in args:
