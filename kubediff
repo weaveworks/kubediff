@@ -23,9 +23,8 @@ def diff_dicts(path, want, have):
     key_path = "%s.%s" % (path, k)
 
     check(k in have, "%s: '%s' missing", path, k)
-    have_v = have[k]
-
-    diff(key_path, want_v, have_v)
+    if k in have:
+      diff(key_path, want_v, have[k])
 
 def diff(path, want, have):
   if isinstance(want, dict):
@@ -38,6 +37,10 @@ def diff(path, want, have):
     check(want == have, "%s: '%s' != '%s'", path, want, have)
 
 def check_file(path):
+  _, extension = os.path.splitext(path)
+  if extension != ".yaml":
+    return
+
   with open(path, 'r') as stream:
     expected = yaml.load(stream)
 
