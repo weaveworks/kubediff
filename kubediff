@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+
+import yaml, sys, os, os.path, string, subprocess, optparse
+
+failed = False
+
+# checks, for every file, that the object exists and is configured in the right way in k8s
+# assumes your kubectl is setup to talk to the right cluster
+def check(b, msg, *arg):
+  global failed
+  if not b:
+    print " *** " + msg % arg
+    failed = True
+
+def diff_lists(path, want, have):
+  check(len(want) == len(have), "len(%s): %d != %d", path, len(want), len(have))
+
+  for i, (want_v, have_v) in enumerate(zip(want, have)):
+     diff("%s[%d]" % (path, i), want_v, have_v)
+
+def diff_dicts(path, want, have):
+  for k, want_v in want.iteritems():
+    key_path = "%s.%s" % (path, k)
+
+    check(k in have, "%s: '%s' missing", path, k)
+    have_v = have[k]
+
+    diff(key_path, want_v, have_v)
+
+def diff(path, want, have):
+  if isinstance(want, dict):
+    diff_dicts(path, want, have)
+
+  elif isinstance(want, list):
+    diff_lists(path, want, have)
+
+  else:
+    check(want == have, "%s: '%s' != '%s'", path, want, have)
+
+def check_file(path):
+  with open(path, 'r') as stream:
+    expected = yaml.load(stream)
+
+  kind = expected["kind"]
+  name = expected["metadata"]["name"]
+  namespace = expected["metadata"]["namespace"] if "namespace" in expected["metadata"] else "default"
+
+  print "Checking %s '%s'" % (kind, name)
+
+  args = ["--namespace=%s" % namespace, "-o=yaml"]
+  if options.kubeconfig is not None:
+    args.append("--kubeconfig=%s" % options.kubeconfig)
+
+  running = subprocess.check_output(["kubectl", "get"] + args + [kind, name])
+  running = yaml.load(running)
+
+  diff("", expected, running)
+
+def check_dir(path):
+  for filename in os.listdir(path):
+    check_path(os.path.join(path, filename))
+
+def check_path(path):
+  if os.path.isdir(path):
+    check_dir(path)
+  else:
+    check_file(path)
+
+if __name__ == "__main__":
+  parser =  optparse.OptionParser("usage: %prog [options] <dir/file>...")
+  parser.add_option("--kubeconfig", help="path to kubeconfig")
+  (options, args) = parser.parse_args()
+  if len(args) == 0:
+    parser.print_usage()
+    sys.exit(1)
+
+  for path in args:
+    check_path(path)
+
+  if failed:
+    sys.exit(2)
+
