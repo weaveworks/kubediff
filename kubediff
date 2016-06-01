@@ -4,8 +4,6 @@ import yaml, sys, os, os.path, string, subprocess, optparse
 
 failed = False
 
-# checks, for every file, that the object exists and is configured in the right way in k8s
-# assumes your kubectl is setup to talk to the right cluster
 def check(b, msg, *arg):
   global failed
   if not b:
@@ -76,7 +74,13 @@ def check_path(path):
     check_file(path)
 
 if __name__ == "__main__":
-  parser =  optparse.OptionParser("usage: %prog [options] <dir/file>...")
+  parser =  optparse.OptionParser("""usage: %prog [options] <dir/file>...
+
+Compare yaml files in <dir> to running state in kubernetes and print the
+differences.  This is useful to ensure you have applied all your changes to the
+appropriate environement.  This tools runs kubectl, so unless your
+~/.kube/config is configured for the correct environement, you will need to
+supply the kubeconfig for the appropriate environment.""")
   parser.add_option("--kubeconfig", help="path to kubeconfig")
   (options, args) = parser.parse_args()
   if len(args) == 0:
