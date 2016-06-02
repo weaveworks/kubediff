@@ -55,8 +55,7 @@ def check_file(path):
   try:
     running = subprocess.check_output(["kubectl", "get"] + args + [kind, name], stderr=subprocess.STDOUT)
   except subprocess.CalledProcessError, e:
-    print " *** %s" % e.output
-    failed = True
+    check(False, " *** %s", e.output)
     return
 
   running = yaml.load(running)
@@ -92,4 +91,3 @@ supply the kubeconfig for the appropriate environment.""")
 
   if failed:
     sys.exit(2)
-
