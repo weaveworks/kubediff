@@ -20,7 +20,7 @@ spec:
         # version.
         image: tomwilkie/git-sync:f6165715ce9d
         args:
-          - -repo=https://github.com/weaveworks/kubediff
+          - -repo=https://github.com/<your config repo>
           - -wait=60
           - -dest=/data/repo
         env:
