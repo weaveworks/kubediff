@@ -54,4 +54,20 @@ And to view the UI, run the follow command and go to http://localhost:4040
 
     $ kubectl port-forward $(kubectl get pod --selector=name=kubediff -o jsonpath={.items..metadata.name}) 4040:80
 
-![Kubediff Screenshot](/screenshot.png?raw=true)
+![Kubediff Screenshot](/imgs/screenshot.png)
+
+This service exports the exit code of the kubediff as a Prometheus metric;
+a suitable alert can be setup for persistent differences:
+
+    ALERT Kubediff
+      IF          max(command_exit_code{job="kubediff"}) != 0
+      FOR         2h
+      LABELS      { severity="warning" }
+      ANNOTATIONS {
+        summary = "Kubediff has detected a difference in running config.",
+        description = "Kubediff has detected a difference in running config.",
+      }
+
+These alerts can be sent to Slack, for example:
+
+![Slack Alert](/imgs/alert.png)
