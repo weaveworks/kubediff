@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: kubediff
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: kubediff
+    spec:
+      volumes:
+      - name: repo
+        emptyDir: {}
+      containers:
+      - name: git-sync
+        # These is an official google build of git-sync, but its out of date
+        # wrt private repos.  Also git-sync is a pain to integrate with our
+        # build (uses godeps etc).  So for not, use a pinned custom built
+        # version.
+        image: tomwilkie/git-sync:f6165715ce9d
+        args:
+          - -repo=https://github.com/weaveworks/kubediff
+          - -wait=60
+          - -dest=/data/repo
+        env:
+        - name: GIT_SYNC_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: kubediff-secret
+              key: username
+        - name: GIT_SYNC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kubediff-secret
+              key: password
+        volumeMounts:
+        - name: repo
+          mountPath: /data
+      - name: kubediff
+        image: weaveworks/kubediff
+        imagePullPolicy: IfNotPresent
+        args:
+        - -period=60s
+        - -listen-addr=:80
+        - /bin/kubediff
+        - /data/repo/<location in your repo of yaml files>
+        volumeMounts:
+        - name: repo
+          mountPath: /data
+        ports:
+        - containerPort: 80
