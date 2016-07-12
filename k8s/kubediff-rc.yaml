@@ -43,7 +43,7 @@ spec:
         args:
         - -period=60s
         - -listen-addr=:80
-        - /bin/kubediff
+        - /kubediff
         - /data/repo/<location in your repo of yaml files>
         volumeMounts:
         - name: repo

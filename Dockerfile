@@ -5,6 +5,6 @@ RUN apk update && \
    curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.2.4/bin/linux/amd64/kubectl && \
    chmod u+x /bin/kubectl
 WORKDIR /
-COPY prom-run /bin
+COPY prom-run kubediff /
 EXPOSE 80
-ENTRYPOINT ["/bin/prom-run"]
+ENTRYPOINT ["/prom-run"]
