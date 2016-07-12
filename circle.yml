@@ -3,10 +3,13 @@ machine:
     - docker
   environment:
     PATH: /usr/local/go/bin:$HOME/bin:$PATH
+    GOPATH: /home/ubuntu:$GOPATH
+    SRCDIR: /home/ubuntu/src/github.com/weaveworks/kubediff
 
 test:
   override:
-    - make
+    - "mkdir -p $(dirname $SRCDIR) && cp -r $(pwd)/ $SRCDIR"
+    - cd $SRCDIR; make
 
 deployment:
   push:
