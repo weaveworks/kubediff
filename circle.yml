@@ -1,0 +1,16 @@
+machine:
+  services:
+    - docker
+  environment:
+    PATH: /usr/local/go/bin:$HOME/bin:$PATH
+
+test:
+  override:
+    - make
+
+deployment:
+  push:
+    branch: master
+    commands:
+      - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD"
+      - docker push weaveworks/kubediff:$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)
