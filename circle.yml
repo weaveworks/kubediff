@@ -17,3 +17,4 @@ deployment:
     commands:
       - docker login -e "$DOCKER_REGISTRY_EMAIL" -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD"
       - docker push weaveworks/kubediff:$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)
+      - docker push weaveworks/kubediff:latest
