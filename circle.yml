@@ -1,10 +1,16 @@
 machine:
+  python:
+    version: 2.7.9
   services:
     - docker
   environment:
     PATH: /usr/local/go/bin:$HOME/bin:$PATH
     GOPATH: /home/ubuntu:$GOPATH
     SRCDIR: /home/ubuntu/src/github.com/weaveworks/kubediff
+
+dependencies:
+  pre:
+    - pip install -r dev-requirements.txt
 
 test:
   override:
