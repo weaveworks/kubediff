@@ -51,5 +51,4 @@ environment, and show how the code in SOURCE differs from TARGET.
     source_env_path, target_env_path)
 
 
-if __name__ == '__main__':
-  main()
+main()
