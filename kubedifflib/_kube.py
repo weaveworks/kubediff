@@ -1,3 +1,4 @@
+import attr
 import os
 import subprocess
 import yaml
@@ -21,13 +22,13 @@ def iter_files(paths):
           yield os.path.join(root, filename)
 
 
+@attr.s
 class KubeObject(object):
   """A Kubernetes object."""
 
-  def __init__(self, namespace, kind, name):
-    self.namespace = namespace
-    self.kind = kind
-    self.name = name
+  namespace = attr.ib()
+  kind = attr.ib()
+  name = attr.ib()
 
   @classmethod
   def from_dict(cls, data):

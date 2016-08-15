@@ -5,9 +5,15 @@ from ._diff import (
   JSONPrinter,
   StdoutPrinter
 )
+from ._images import (
+  get_differing_images,
+  load_config,
+)
 
 __all__ = [
   check_files,
   JSONPrinter,
-  StdoutPrinter
+  StdoutPrinter,
+  load_config,
+  get_differing_images,
 ]
