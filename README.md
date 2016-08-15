@@ -28,6 +28,10 @@ For example:
     Checking Secret 'kubediff-secret'
     Checking Service 'kubediff'
 
+Make sure the dependencies are installed first:
+
+    $ pip install -r requirements.txt
+
 Kubediff can also be run as a service on Kubernetes, periodically downloading the
 latest configuration from Github, comparing it to the running configuration.  In
 this mode Kubediff will also offers a very simple UI showing the output and
@@ -71,3 +75,18 @@ a suitable alert can be setup for persistent differences:
 These alerts can be sent to Slack, for example:
 
 ![Slack Alert](/imgs/alert.png)
+
+## compare-images
+
+To quickly see how two environments differ, in terms of images:
+
+```
+$ ./compare-images ../service-conf/k8s/dev/ ../service-conf/k8s/prod/
+Image                          dev                   prod
+-----------------------------  --------------------  --------------------
+quay.io/weaveworks/grafana     master-0fc7cc2        master-08fd09d
+quay.io/weaveworks/prometheus  master-0fc7cc2        master-4fb2aed
+quay.io/weaveworks/ui-server   master-2899c36        master-45d67b3
+tomwilkie/prometheus           frankenstein-8a5ec1b  frankenstein-ebe5808
+weaveworks/scope               master-1a1021c        master-14d0e4e
+```
