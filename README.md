@@ -78,7 +78,8 @@ These alerts can be sent to Slack, for example:
 
 ## compare-images
 
-To quickly see how two environments differ, in terms of images:
+To quickly see how two sets of configurations differ, purely in terms of
+images:
 
 ```
 $ ./compare-images ../service-conf/k8s/dev/ ../service-conf/k8s/prod/
