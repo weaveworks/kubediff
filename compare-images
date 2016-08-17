@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+import json
+import optparse
+import os
+import sys
+from tabulate import tabulate
+
+from kubedifflib import (
+  get_differing_images,
+  load_config,
+)
+
+
+def format_table(differences, source_env_path, target_env_path):
+  """Format image differences as a table."""
+  source_env = os.path.basename(source_env_path.rstrip('/'))
+  target_env = os.path.basename(target_env_path.rstrip('/'))
+  return tabulate(
+    [[image, src, tgt] for image, (src, tgt) in sorted(differences.iteritems())],
+    headers=["Image", source_env, target_env],
+  )
+
+
+def format_differences(output_format, differences, source_env_path, target_env_path):
+  if output_format == 'json':
+    return json.dumps(differences)
+  return format_table(differences, source_env_path, target_env_path)
+
+
+def main():
+  parser = optparse.OptionParser("""\
+Usage: %prog SOURCE TARGET
+
+Compare YAML files in the SOURCE environment to YAML files in the TARGET
+environment, and show how the code in SOURCE differs from TARGET.
+""")
+  parser.add_option("--format", help="format for output: json, table, pprint")
+  (options, args) = parser.parse_args()
+  try:
+    [source_env_path, target_env_path] = args
+  except ValueError:
+    parser.print_help()
+    sys.exit(1)
+
+  source_env = load_config(source_env_path)
+  target_env = load_config(target_env_path)
+
+  print format_differences(
+    options.format, get_differing_images(source_env, target_env),
+    source_env_path, target_env_path)
+
+
+main()
