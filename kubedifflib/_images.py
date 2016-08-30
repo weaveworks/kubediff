@@ -45,7 +45,8 @@ class Image(object):
     try:
       [name, label] = image_name.split(':', 1)
     except ValueError:
-      raise InvalidImageName(image_name)
+      name = image_name
+      label = "latest"
     return cls(name, label)
 
 
