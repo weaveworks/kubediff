@@ -42,6 +42,10 @@ class KubeObject(object):
     namespace = data["metadata"].get("namespace", "default")
     return cls(namespace, kind, name)
 
+  @property
+  def namespaced_name(self):
+    return "%s/%s" % (self.namespace, self.name)
+
   def get_from_cluster(self, kubeconfig=None):
     """Fetch data for this object from a Kubernetes cluster.
 

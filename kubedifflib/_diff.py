@@ -97,8 +97,8 @@ def check_file(printer, path, kubeconfig=None):
 
 
 class StdoutPrinter(object):
-  def add(self, kube_obj):
-    print "Checking %s '%s'" % (kube_obj.kind, kube_obj.name)
+  def add(self, _, kube_obj):
+    print "Checking %s '%s'" % (kube_obj.kind, kube_obj.namespaced_name)
 
   def diff(self, kube_obj, difference):
     print " *** " + difference.to_text()
