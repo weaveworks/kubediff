@@ -30,7 +30,7 @@ supply the kubeconfig for the appropriate environment.""")
     printer = JSONPrinter()
 
   failed = check_files(args, printer, options.kubeconfig)
-  if failed:
+  if failed and not options.json:
     sys.exit(2)
 
 
