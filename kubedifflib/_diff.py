@@ -92,7 +92,7 @@ def check_file(printer, path, kubeconfig=None):
   differences = 0
   for difference in diff("", expected, running):
     differences += 1
-    printer.diff(kube_obj, difference)
+    printer.diff(path, difference)
   return differences
 
 
