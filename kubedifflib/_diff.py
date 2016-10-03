@@ -87,7 +87,7 @@ def check_file(printer, path, kubeconfig=None):
     running = kube_obj.get_from_cluster(kubeconfig=kubeconfig)
   except subprocess.CalledProcessError, e:
     printer.diff(path, Difference(e.output, None))
-    return 0
+    return 1
 
   differences = 0
   for difference in diff("", expected, running):
