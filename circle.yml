@@ -9,7 +9,7 @@ machine:
     SRCDIR: /home/ubuntu/src/github.com/weaveworks/kubediff
 
 dependencies:
-  pre:
+  override:
     - pip install -r dev-requirements.txt
     - go get github.com/weaveworks/build-tools/cmd/wcloud
 
