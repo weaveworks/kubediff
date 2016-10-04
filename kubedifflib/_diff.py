@@ -1,4 +1,5 @@
 from functools import partial
+import collections
 import json
 import os
 import subprocess
@@ -30,7 +31,6 @@ def different_lengths(path, want, have):
 
 missing_item = partial(Difference, "'%s' missing")
 not_equal = partial(Difference, "'%s' != '%s'")
-broken_cluster = partial(Difference, " *** %s", None)
 
 
 def diff_lists(path, want, have):
@@ -81,26 +81,26 @@ def check_file(printer, path, kubeconfig=None):
 
   kube_obj = KubeObject.from_dict(expected)
 
-  printer.add(kube_obj)
+  printer.add(path, kube_obj)
 
   try:
     running = kube_obj.get_from_cluster(kubeconfig=kubeconfig)
   except subprocess.CalledProcessError, e:
-    printer.diff(kube_obj, broken_cluster(e.output))
-    return
+    printer.diff(path, Difference(e.output, None))
+    return 1
 
   differences = 0
   for difference in diff("", expected, running):
     differences += 1
-    printer.diff(kube_obj, difference)
+    printer.diff(path, difference)
   return differences
 
 
 class StdoutPrinter(object):
-  def add(self, kube_obj):
-    print "Checking %s '%s'" % (kube_obj.kind, kube_obj.name)
+  def add(self, _, kube_obj):
+    print "Checking %s '%s'" % (kube_obj.kind, kube_obj.namespaced_name)
 
-  def diff(self, kube_obj, difference):
+  def diff(self, _, difference):
     print " *** " + difference.to_text()
 
   def finish(self):
@@ -109,14 +109,13 @@ class StdoutPrinter(object):
 
 class JSONPrinter(object):
   def __init__(self):
-    self.data = {}
+    self.data = collections.defaultdict(list)
 
-  def add(self, kube_obj):
-    self.data.setdefault(kube_obj.kind, {}).setdefault(kube_obj.name, [])
+  def add(self, path, kube_obj):
+    pass
 
-  def diff(self, kube_obj, difference):
-    record = self.data[kube_obj.kind][kube_obj.name]
-    record.append([difference.path] + list(difference.args))
+  def diff(self, path, difference):
+    self.data[path].append(difference.to_text())
 
   def finish(self):
     print json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': '))
