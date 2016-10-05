@@ -9,7 +9,8 @@ RUN apk update && \
 
 COPY . /tmp/kubediff/
 RUN pip install /tmp/kubediff/
+RUN pip install -r /tmp/kubediff/requirements.txt
 
-COPY prom-run kubediff /
+COPY prom-run kubediff compare-images /
 EXPOSE 80
 ENTRYPOINT ["/prom-run"]
