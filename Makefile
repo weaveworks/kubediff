@@ -3,7 +3,7 @@
 
 all: .uptodate
 
-IMAGE_VERSION := $(shell git rev-parse --abbrev-ref HEAD)-$(shell git rev-parse --short HEAD)
+IMAGE_VERSION := $(shell ./tools/image-tag)
 
 .uptodate: prom-run Dockerfile
 	docker build -t weaveworks/kubediff .
