@@ -77,22 +77,25 @@ def check_file(printer, path, kubeconfig=None):
   :return: Number of differences found.
   """
   with open(path, 'r') as stream:
-    expected = yaml.load(stream)
+    expected = yaml.load_all(stream)
 
-  kube_obj = KubeObject.from_dict(expected)
+    differences = 0
+    for data in expected:
+      kube_obj = KubeObject.from_dict(data)
 
-  printer.add(path, kube_obj)
+      printer.add(path, kube_obj)
 
-  try:
-    running = kube_obj.get_from_cluster(kubeconfig=kubeconfig)
-  except subprocess.CalledProcessError, e:
-    printer.diff(path, Difference(e.output, None))
-    return 1
+      try:
+        running = kube_obj.get_from_cluster(kubeconfig=kubeconfig)
+      except subprocess.CalledProcessError, e:
+        printer.diff(path, Difference(e.output, None))
+        differences += 1
+        continue
 
-  differences = 0
-  for difference in diff("", expected, running):
-    differences += 1
-    printer.diff(path, difference)
+
+      for difference in diff("", data, running):
+        differences += 1
+        printer.diff(path, difference)
   return differences
 
 
