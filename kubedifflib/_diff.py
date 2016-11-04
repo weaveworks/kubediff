@@ -53,12 +53,22 @@ def diff_dicts(path, want, have):
         yield difference
 
 
+def normalize(value):
+  if isinstance(value, int):
+    return str(value)
+  if value == [] or value == {}:
+    return None
+  return value
+
+
 def diff(path, want, have):
-  if isinstance(want, dict):
+  want = normalize(want)
+  have = normalize(have)
+  if isinstance(want, dict) and isinstance(have, dict):
     for difference in diff_dicts(path, want, have):
       yield difference
 
-  elif isinstance(want, list):
+  elif isinstance(want, list) and isinstance(have, list):
     for difference in diff_lists(path, want, have):
       yield difference
 
