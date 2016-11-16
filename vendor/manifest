@@ -5,7 +5,7 @@
 			"importpath": "github.com/tomwilkie/prom-run",
 			"repository": "https://github.com/tomwilkie/prom-run",
 			"vcs": "git",
-			"revision": "fe36d85588336c8183ab0306d2d578a1dffb423e",
+			"revision": "b70ba9aeb14e21b233d8d0b7b75dd43fa749e565",
 			"branch": "master",
 			"notests": true
 		}
