@@ -11,7 +11,6 @@ machine:
 dependencies:
   override:
     - pip install -r dev-requirements.txt
-    - go get github.com/weaveworks/build-tools/cmd/wcloud
 
 test:
   override:
@@ -25,4 +24,3 @@ deployment:
       - docker login -e "$DOCKER_REGISTRY_EMAIL" -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD"
       - docker push weaveworks/kubediff:$(./tools/image-tag)
       - docker push weaveworks/kubediff:latest
-      - wcloud deploy -u circle weaveworks/kubediff:$(./tools/image-tag)
