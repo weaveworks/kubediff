@@ -24,3 +24,8 @@ deployment:
       - docker login -e "$DOCKER_REGISTRY_EMAIL" -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD"
       - docker push weaveworks/kubediff:$(./tools/image-tag)
       - docker push weaveworks/kubediff:latest
+      - docker login -e "." -u "$QUAY_USER" -p "$QUAY_PASSWORD" quay.io
+      - docker tag weaveworks/kubediff:$(./tools/image-tag) quay.io/weaveworks/kubediff:$(./tools/image-tag)
+      - docker tag weaveworks/kubediff:latest quay.io/weaveworks/kubediff:latest
+      - docker push quay.io/weaveworks/kubediff:$(./tools/image-tag)
+      - docker push quay.io/weaveworks/kubediff:latest
