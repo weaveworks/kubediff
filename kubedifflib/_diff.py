@@ -80,13 +80,13 @@ def diff(path, want, have):
       yield difference
 
   elif isinstance(want, basestring) and isinstance(have, basestring):
-    if not want == have:
+    if want != have:
       if "\n" in want:
         yield diff_not_equal(path, want, have)
       else:
         yield not_equal(path, want, have)
 
-  elif not want == have:
+  elif want != have:
     yield not_equal(path, want, have)
 
 
