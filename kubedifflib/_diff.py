@@ -1,5 +1,6 @@
 from functools import partial
 import collections
+import difflib
 import json
 import os
 import subprocess
@@ -31,6 +32,12 @@ def different_lengths(path, want, have):
 
 missing_item = partial(Difference, "'%s' missing")
 not_equal = partial(Difference, "'%s' != '%s'")
+
+
+def diff_not_equal(path, want, have):
+  want_lines, have_lines = want.splitlines(), have.splitlines()
+  diff = "\n".join(difflib.unified_diff(want_lines, have_lines, fromfile=path, tofile="running", lineterm=""))
+  return Difference("Diff:\n%s", path, diff)
 
 
 def diff_lists(path, want, have):
@@ -72,9 +79,15 @@ def diff(path, want, have):
     for difference in diff_lists(path, want, have):
       yield difference
 
-  else:
-    if not want == have:
-      yield not_equal(path, want, have)
+  elif isinstance(want, basestring) and isinstance(have, basestring):
+    if want != have:
+      if "\n" in want:
+        yield diff_not_equal(path, want, have)
+      else:
+        yield not_equal(path, want, have)
+
+  elif want != have:
+    yield not_equal(path, want, have)
 
 
 def check_file(printer, path, kubeconfig=None):
