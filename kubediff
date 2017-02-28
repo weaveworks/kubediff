@@ -6,7 +6,7 @@ import sys
 from kubedifflib import (
   check_files,
   JSONPrinter,
-  StdoutPrinter,
+  QuietTextPrinter,
 )
 
 
@@ -27,7 +27,7 @@ supply the kubeconfig for the appropriate environment.""")
     parser.print_help()
     sys.exit(1)
 
-  printer = StdoutPrinter()
+  printer = QuietTextPrinter()
   if options.json:
     printer = JSONPrinter()
 
