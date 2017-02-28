@@ -4,6 +4,7 @@ import difflib
 import json
 import os
 import subprocess
+import sys
 import yaml
 
 from ._kube import (
@@ -128,6 +129,33 @@ class StdoutPrinter(object):
 
   def diff(self, _, difference):
     print " *** " + difference.to_text()
+
+  def finish(self):
+    pass
+
+
+class QuietTextPrinter(object):
+  """Only output if there's a difference."""
+
+  def __init__(self, stream=None):
+    self._stream = stream if stream else sys.stdout
+    self._current = None
+
+  def _write(self, msg, *args):
+    self._stream.write(msg % args)
+    self._stream.write('\n')
+    self._stream.flush()
+
+  def add(self, _, kube_obj):
+    self._current = kube_obj
+
+  def diff(self, _, difference):
+    if self._current:
+      self._write('## %s (%s)', self._current.namespaced_name, self._current.kind)
+    else:
+      self._write('## UNKNOWN')
+    self._write('')
+    self._write(difference.to_text())
 
   def finish(self):
     pass
