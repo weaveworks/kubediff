@@ -3,19 +3,16 @@ machine:
     version: 2.7.9
   services:
     - docker
-  environment:
-    PATH: /usr/local/go/bin:$HOME/bin:$PATH
-    GOPATH: /home/ubuntu:$GOPATH
-    SRCDIR: /home/ubuntu/src/github.com/weaveworks/kubediff
 
 dependencies:
   override:
     - pip install -r dev-requirements.txt
+    - mkdir -p ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
 test:
   override:
-    - "mkdir -p $(dirname $SRCDIR) && cp -r $(pwd)/ $SRCDIR"
-    - cd $SRCDIR; make
+    - cd ${HOME}/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}; make
 
 deployment:
   push:

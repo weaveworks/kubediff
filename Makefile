@@ -12,8 +12,7 @@ IMAGE_VERSION := $(shell ./tools/image-tag)
 	docker tag weaveworks/kubediff:latest quay.io/weaveworks/kubediff:latest
 
 prom-run: vendor/github.com/tomwilkie/prom-run/*.go
-	go get ./vendor/github.com/tomwilkie/prom-run
-	CGO_ENABLED=0 GOOS=linux go build -ldflags "-s" -a -installsuffix cgo -o $@ ./vendor/github.com/tomwilkie/prom-run
+	CGO_ENABLED=0 GOOS=linux go build ./vendor/github.com/tomwilkie/prom-run
 
 lint:
 	flake8 kubediff
