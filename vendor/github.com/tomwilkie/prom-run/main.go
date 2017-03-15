@@ -1,10 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -28,7 +29,7 @@ var (
 )
 
 func reap() {
-	log.Printf("Reaping children")
+	log.Debugf("Reaping children")
 	var wstatus syscall.WaitStatus
 	for {
 		pid, err := syscall.Wait4(-1, &wstatus, 0, nil)
@@ -36,13 +37,19 @@ func reap() {
 			// No more children to reap, stop
 			return
 		}
-		log.Printf("Reaped child %d, wstatus=%+v, err=%v", pid, wstatus, err)
+		log.Debugf("Reaped child %d, wstatus=%+v, err=%v", pid, wstatus, err)
 	}
+}
+
+type pair struct {
+	out []byte
+	err error
 }
 
 func main() {
 	var (
 		period     = flag.Duration("period", 10*time.Second, "Period with which to run the command.")
+		timeout    = flag.Duration("timeout", 10*time.Minute, "Amount of time to give the command to run.")
 		listenAddr = flag.String("listen-addr", ":9152", "Address to listen on")
 	)
 	flag.Usage = func() {
@@ -71,9 +78,29 @@ func main() {
 
 	go func() {
 		for range time.Tick(*period) {
-			log.Printf("Running '%s' with argments %v", command, args)
 			start := time.Now()
-			out, err := exec.Command(command, args...).CombinedOutput()
+			log.Infof("Running '%s' with argments %v", command, args)
+			ctx, cancel := context.WithCancel(context.Background())
+			cmd := exec.CommandContext(ctx, command, args...)
+			result := make(chan pair)
+
+			go func() {
+				out, err := cmd.CombinedOutput()
+				result <- pair{out, err}
+			}()
+
+			var out []byte
+			var err error
+			select {
+			case pair := <-result:
+				out = pair.out
+				err = pair.err
+			case <-time.After(*timeout):
+				out = []byte("command timed out")
+				err = fmt.Errorf("command timed out")
+				cancel()
+			}
+
 			duration := time.Now().Sub(start)
 			commandDuration.Observe(duration.Seconds())
 
@@ -89,12 +116,13 @@ func main() {
 				if exiterr, ok := err.(*exec.ExitError); ok {
 					if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 						code := status.ExitStatus()
-						log.Printf("Command exited with code: %d", code)
+						log.Infof("Command exited with code: %d", code)
 						statusCode.Set(float64(code))
 						continue
 					}
 				}
-				log.Printf("Error running command: %v", err)
+				log.Warnf("Error running command: %v", err)
+				log.Printf("Output:\n%s", out)
 				statusCode.Set(255)
 				continue
 			}
