@@ -10,8 +10,8 @@ Kubediff can be run from the command line:
 
     Compare yaml files in <dir> to running state in kubernetes and print the
     differences.  This is useful to ensure you have applied all your changes to the
-    appropriate environement.  This tools runs kubectl, so unless your
-    ~/.kube/config is configured for the correct environement, you will need to
+    appropriate environment.  This tools runs kubectl, so unless your
+    ~/.kube/config is configured for the correct environment, you will need to
     supply the kubeconfig for the appropriate environment.
 
     Options:
