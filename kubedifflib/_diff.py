@@ -45,9 +45,13 @@ def diff_lists(path, want, have):
   if not len(want) == len(have):
     yield different_lengths(path, want, have)
 
-  for i, (want_v, have_v) in enumerate(zip(want, have)):
-     for difference in diff("%s[%d]" % (path, i), want_v, have_v):
-       yield difference
+  for i, want_v in enumerate(want):
+    for j, have_v in enumerate(have):
+      if len(list(diff(None, want_v, have_v))) == 0:
+        del have[j]
+        break
+    else:
+      yield missing_item(path, "element [%d]" % i)
 
 
 def diff_dicts(path, want, have):
