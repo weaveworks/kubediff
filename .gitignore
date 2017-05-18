@@ -1,2 +1,5 @@
 prom-run
 *.pyc
+/.hypothesis
+/*.egg-info
+/.cache

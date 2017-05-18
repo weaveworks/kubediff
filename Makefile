@@ -17,5 +17,8 @@ prom-run: vendor/github.com/tomwilkie/prom-run/*.go
 lint:
 	flake8 kubediff
 
+test:
+	py.test
+
 clean:
 	rm -f prom-run .uptodate
