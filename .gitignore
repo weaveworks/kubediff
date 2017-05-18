@@ -3,3 +3,7 @@ prom-run
 /.hypothesis
 /*.egg-info
 /.cache
+/junit.xml
+/.ensure-pip
+/.ensure-virtualenv
+/.env
