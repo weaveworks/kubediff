@@ -5,7 +5,7 @@ import random
 from hypothesis import given
 from hypothesis.strategies import integers, lists, text
 
-from kubedifflib._diff import diff_lists
+from kubedifflib._diff import diff_lists, list_subtract
 
 
 @given(path=text(), xs=lists(integers()))
@@ -23,7 +23,7 @@ def test_same_list_shuffled_is_not_different(path, xs):
 
 
 @given(path=text(), xs=lists(lists(integers())))
-def failing_test_same_list_shuffled_is_not_different_nested(path, xs):
+def test_same_list_shuffled_is_not_different_nested(path, xs):
     """No difference between two lists with same values in different order.
 
     This variant is for when there are nested lists, to catch loop / mutation
@@ -43,12 +43,21 @@ def test_added_items_appear_in_diff(path, base, extension):
     assert len(list(diff_lists(path, xs, ys))) == len(extension)
 
 
-# TODO: Would like to add a test that shows that we can use the diff to
-# transform one list into another, but that's not possible with the current
-# code since:
-#   1. We don't store the information in a structured format
-#   2. We completely ignore things present in second list that aren't
-#      in first list
+@given(xs=lists(integers()))
+def test_list_subtract_same_list(xs):
+    assert list(list_subtract(xs, xs)) == []
+    ys = list(xs)
+    random.shuffle(ys)
+    assert list(list_subtract(xs, ys)) == []
+
+
+@given(xs=lists(integers()), ys=lists(integers()))
+def test_list_subtract_recover(xs, ys):
+    missing = list_subtract(xs, ys)
+    zs = list(ys)
+    zs.extend([xs[i] for i in missing])
+    assert list(list_subtract(xs, zs)) == []
+
 
 def two_lists_of_same_size(generator):
     """Generate two lists of the same length."""

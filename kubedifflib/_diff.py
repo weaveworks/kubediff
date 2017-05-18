@@ -2,6 +2,7 @@ from functools import partial
 import collections
 import difflib
 import json
+import operator
 import os
 import subprocess
 import sys
@@ -45,13 +46,25 @@ def diff_lists(path, want, have):
   if not len(want) == len(have):
     yield different_lengths(path, want, have)
 
-  for i, want_v in enumerate(want):
-    for j, have_v in enumerate(have):
-      if len(list(diff(None, want_v, have_v))) == 0:
-        del have[j]
+  def eq(x, y):
+    return len(list(diff(None, x, y))) == 0
+
+  for i in list_subtract(want, have, eq):
+    yield missing_item(path, "element [%d]" % i)
+
+
+def list_subtract(xs, ys, equality=operator.eq):
+  """Return items in 'xs' but not in 'ys'."""
+  matched = set()
+  for i, x in enumerate(xs):
+    for j, y in enumerate(ys):
+      if j in matched:
+        continue
+      if equality(x, y):
+        matched.add(j)
         break
     else:
-      yield missing_item(path, "element [%d]" % i)
+      yield i
 
 
 def diff_dicts(path, want, have):
