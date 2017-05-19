@@ -1,2 +1,9 @@
 prom-run
 *.pyc
+/.hypothesis
+/*.egg-info
+/.cache
+/junit.xml
+/.ensure-pip
+/.ensure-virtualenv
+/.env

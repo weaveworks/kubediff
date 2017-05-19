@@ -3,16 +3,19 @@ machine:
     version: 2.7.9
   services:
     - docker
+  environment:
+    PATH: $HOME/bin:$PATH
+    SRCDIR: $HOME/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
 dependencies:
   override:
-    - pip install -r dev-requirements.txt
-    - mkdir -p ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}
-    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    - make deps
 
 test:
   override:
-    - cd ${HOME}/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}; make
+    - "mkdir -p $(dirname $SRCDIR) && cp -r $(pwd)/ $SRCDIR"
+    - "mkdir -p $CIRCLE_TEST_REPORTS/py.test/"
+    - cd $SRCDIR; make JUNIT_XML=$CIRCLE_TEST_REPORTS/py.test/junit.xml all
 
 deployment:
   push:
