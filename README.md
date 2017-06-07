@@ -91,3 +91,14 @@ quay.io/weaveworks/ui-server   master-2899c36        master-45d67b3
 tomwilkie/prometheus           frankenstein-8a5ec1b  frankenstein-ebe5808
 weaveworks/scope               master-1a1021c        master-14d0e4e
 ```
+
+## Build
+
+```
+mkdir -p $GOPATH/src/github.com/prometheus && cd "$_"
+git clone git@github.com:prometheus/client_golang.git
+mkdir -p $GOPATH/src/github.com/weaveworks && cd "$_"
+git clone git@github.com:weaveworks/kubediff.git
+cd kubediff
+make
+```
