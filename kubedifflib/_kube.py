@@ -46,16 +46,24 @@ class KubeObject(object):
   def namespaced_name(self):
     return "%s/%s" % (self.namespace, self.name)
 
-  def get_from_cluster(self, kubeconfig=None):
+  def get_from_cluster(self, kubeconfig=None, context=None, namespace=None):
     """Fetch data for this object from a Kubernetes cluster.
 
     :param str kubeconfig: Path to a Kubernetes configuration file. If None,
         fetches data from the default cluster.
+    :param str context: Name of Kubernetes context to use. If None,
+        fetches data from the default context.
+    :param str namespace: Name of Kubernetes namespace to use. If None,
+        fetches data from the default context's namespace.
     :return: A dict of data for this Kubernetes object.
     """
     args = ["--namespace=%s" % self.namespace, "-o=yaml"]
     if kubeconfig is not None:
       args.append("--kubeconfig=%s" % kubeconfig)
+    if context is not None:
+      args.append("--context=%s" % context)
+    if namespace is not None:
+      args.append("--namespace=%s" % namespace)
 
     running = subprocess.check_output(["kubectl", "get"] + args + [self.kind, self.name], stderr=subprocess.STDOUT)
     return yaml.load(running)

@@ -108,7 +108,7 @@ def diff(path, want, have):
     yield not_equal(path, want, have)
 
 
-def check_file(printer, path, kubeconfig=None):
+def check_file(printer, path, kubeconfig=None, context=None, namespace=None):
   """Check YAML file 'path' for differences.
 
   :param printer: Where we report differences to.
@@ -127,7 +127,7 @@ def check_file(printer, path, kubeconfig=None):
       printer.add(path, kube_obj)
 
       try:
-        running = kube_obj.get_from_cluster(kubeconfig=kubeconfig)
+        running = kube_obj.get_from_cluster(kubeconfig=kubeconfig, context=context, namespace=namespace)
       except subprocess.CalledProcessError, e:
         printer.diff(path, Difference(e.output, None))
         differences += 1
@@ -194,11 +194,15 @@ class JSONPrinter(object):
     print json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': '))
 
 
-def check_files(paths, printer, kubeconfig=None):
+def check_files(paths, printer, kubeconfig=None, context=None, namespace=None):
   """Check all files in 'paths' for differences to a Kubernetes cluster.
 
   :param printer: Where differences are reported to as they are found.
   :param str kubeconfig: Path to a kubeconfig file for the cluster to diff
+      against.
+  :param str context: Name of kubernetes context for the cluster to diff
+      against.
+  :param str namespace: Name of kubernetes namespace for the cluster to diff
       against.
   :return: True if there are differences, False otherwise.
   """
@@ -207,7 +211,7 @@ def check_files(paths, printer, kubeconfig=None):
     _, extension = os.path.splitext(path)
     if extension != ".yaml":
       continue
-    differences += check_file(printer, path, kubeconfig=kubeconfig)
+    differences += check_file(printer, path, kubeconfig=kubeconfig, context=context, namespace=namespace)
 
   printer.finish()
   return bool(differences)
