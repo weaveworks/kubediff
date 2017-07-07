@@ -1,7 +1,9 @@
+from fnmatch import fnmatchcase
 from functools import partial
 import collections
 import difflib
 import json
+import numbers
 import operator
 import os
 import subprocess
@@ -29,6 +31,23 @@ class Difference(object):
     return '%s: %s' % (self.path, message)
 
 
+def cpus_equal(a, b):
+  """Compares cpu specs for equality. cpu specs can be ints, floats or strings '{:d}m',
+  where 'm' denotes 'milli-', ie. 1/1000th of an integer value.
+  Eg. "50m" is equal to 0.05."""
+  parse = lambda x: int(x[:-1])/1000. if x.endswith('m') else float(x)
+  return parse(a) == parse(b)
+
+
+# Tolerations specify a path (glob patterns accepted) and a check function.
+# The check function takes (want, have) and is called on matching paths.
+# If it returns True then any difference is 'tolerated', ie. ignored.
+tolerations = {
+  "*.resources.requests.cpu": cpus_equal,
+  "*.resources.limits.cpu": cpus_equal,
+}
+
+
 def different_lengths(path, want, have):
   return Difference("Unequal lengths: %d != %d", path, len(want), len(have))
 
@@ -47,7 +66,7 @@ def diff_lists(path, want, have):
     yield different_lengths(path, want, have)
 
   def eq(x, y):
-    return len(list(diff(None, x, y))) == 0
+    return len(list(diff('', x, y))) == 0
 
   for i in list_subtract(want, have, eq):
     yield missing_item(path, "element [%d]" % i)
@@ -79,7 +98,7 @@ def diff_dicts(path, want, have):
 
 
 def normalize(value):
-  if isinstance(value, int):
+  if isinstance(value, numbers.Number):
     return str(value)
   if value == [] or value == {}:
     return None
@@ -89,6 +108,11 @@ def normalize(value):
 def diff(path, want, have):
   want = normalize(want)
   have = normalize(have)
+
+  for toleration_path, toleration_check in tolerations.items():
+    if fnmatchcase(path, toleration_path) and toleration_check(want, have):
+      return
+
   if isinstance(want, dict) and isinstance(have, dict):
     for difference in diff_dicts(path, want, have):
       yield difference
