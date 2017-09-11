@@ -229,7 +229,7 @@ def check_files(paths, printer, kubeconfig=None):
   differences = 0
   for path in iter_files(paths):
     _, extension = os.path.splitext(path)
-    if extension != ".yaml":
+    if extension not in [".yaml", ".yml"]:
       continue
     differences += check_file(printer, path, kubeconfig=kubeconfig)
 
