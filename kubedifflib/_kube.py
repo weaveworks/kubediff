@@ -39,7 +39,7 @@ class KubeObject(object):
     """
     kind = data["kind"]
     name = data["metadata"]["name"]
-    namespace = data["metadata"].get("namespace", "default")
+    namespace = data["metadata"].get("namespace", "")
     return cls(namespace, kind, name)
 
   @property
