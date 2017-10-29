@@ -227,7 +227,7 @@ def check_files(paths, printer, config):
   differences = 0
   for path in iter_files(paths):
     _, extension = os.path.splitext(path)
-    if extension != ".yaml":
+    if extension != ".yaml" and extension != ".yml":
       continue
     differences += check_file(printer, path, config)
 

@@ -21,7 +21,7 @@ def load_config(*paths):
   """
   objects = {}
   for filename in iter_files(paths):
-    if not filename.endswith('.yaml'):
+    if not filename.endswith(('.yaml', '.yml')):
       continue
     with open(filename, 'r') as stream:
       data = yaml.load(stream)
