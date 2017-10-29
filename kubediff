@@ -19,6 +19,7 @@ appropriate environment.  This tools runs kubectl, so unless your
 ~/.kube/config is configured for the correct environment, you will need to
 supply the kubeconfig for the appropriate environment.""")
   parser.add_option("--kubeconfig", help="path to kubeconfig")
+  parser.add_option("--namespace", help="the namespace to assume for objects where it's not specified", default="default")
   parser.add_option("-j", "--json", help="output in json format", action="store_true", dest="json")
   parser.add_option("--no-error-on-diff", help="don't exit with 2 if diff exists",
                     action="store_false", dest="exit_on_diff", default="true")
@@ -31,10 +32,14 @@ supply the kubeconfig for the appropriate environment.""")
   if options.json:
     printer = JSONPrinter()
 
-  failed = check_files(args, printer, options.kubeconfig)
+  config = {
+      "kubeconfig": options.kubeconfig,
+      "namespace": options.namespace
+  }
+
+  failed = check_files(args, printer, config)
   if failed and options.exit_on_diff:
     sys.exit(2)
-
 
 if __name__ == '__main__':
   main()
