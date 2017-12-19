@@ -27,7 +27,10 @@ def load_config(*paths):
             continue
         with open(path, 'r') as stream:
             data = yaml.safe_load(stream)
-        kube_obj = KubeObject.from_dict(data)
+        try:
+            kube_obj = KubeObject.from_dict(data)
+        except KeyError:
+            continue
         objects[kube_obj] = data
     return objects
 
