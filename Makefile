@@ -58,7 +58,7 @@ test: $(VIRTUALENV_BIN)/py.test
 clean:
 	rm -f prom-run .uptodate $(DEPS_UPTODATE)
 	rm -rf kubedifflib.egg-info
-	find . name '*.pyc' | xargs rm -f
+	find . -name '*.pyc' | xargs rm -f
 
 clean-deps:
 	rm -rf $(VIRTUALENV_DIR)
