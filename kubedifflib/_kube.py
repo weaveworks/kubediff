@@ -31,15 +31,16 @@ class KubeObject(object):
   name = attr.ib()
 
   @classmethod
-  def from_dict(cls, data):
+  def from_dict(cls, data, namespace="default"):
     """Construct a 'KubeObject' from a dictionary of Kubernetes data.
 
-    'data' might be obtained from a Kubernetes cluster, or decoded from a YAML
-    config file.
+    :param dict data: Kubernetes object data; might be obtained from a Kubernetes cluster,
+        or decoded from a YAML config file.
+    :param str namespace: the namespace to use if it's not defined in the object definition
     """
     kind = data["kind"]
     name = data["metadata"]["name"]
-    namespace = data["metadata"].get("namespace", "default")
+    namespace = data["metadata"].get("namespace", namespace)
     return cls(namespace, kind, name)
 
   @property
