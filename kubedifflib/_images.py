@@ -21,7 +21,8 @@ def load_config(*paths):
   """
   objects = {}
   for filename in iter_files(paths):
-    if not filename.endswith('.yaml'):
+    _, extension = os.path.splitext(path)
+    if extension not in [".yaml", ".yml"]:
       continue
     with open(filename, 'r') as stream:
       data = yaml.load(stream)
