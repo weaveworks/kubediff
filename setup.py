@@ -14,7 +14,7 @@ setup(
     url='https://github.com/weaveworks/kubediff',
     author='Weaveworks',
     author_email='help@weave.works',
-    license='MIT',
+    license='Apache 2.0',
     packages=find_packages(),
     install_requires=['PyYAML', 'attrs'],
     scripts=['kubediff', 'compare-images'],
