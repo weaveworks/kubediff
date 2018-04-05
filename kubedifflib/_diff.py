@@ -196,9 +196,7 @@ class QuietTextPrinter(object):
     else:
       self._write('## UNKNOWN')
     self._write('')
-    self._stream.write(difference.to_text())
-    self._stream.write('\n')
-    self._stream.flush()
+    self._write('%s', difference.to_text())
 
   def finish(self):
     pass
