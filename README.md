@@ -18,7 +18,12 @@ Kubediff can be run from the command line:
       -h, --help            show this help message and exit
       --kubeconfig=KUBECONFIG
                             path to kubeconfig
+      --namespace=NAMESPACE
+                            the namespace to assume for objects where it's not
+                            specified (default = Kubernetes default for current
+                            context)
       -j, --json            output in json format
+      --no-error-on-diff    don't exit with 2 if diff exists
 
 For example:
 
