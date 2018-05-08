@@ -1,4 +1,8 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 from fnmatch import fnmatchcase
 from functools import partial
 import collections
@@ -88,7 +92,7 @@ def list_subtract(xs, ys, equality=operator.eq):
 
 
 def diff_dicts(path, want, have):
-  for k, want_v in want.iteritems():
+  for k, want_v in want.items():
     key_path = "%s.%s" % (path, k)
 
     if k not in have:
@@ -110,7 +114,7 @@ def diff(path, want, have):
   want = normalize(want)
   have = normalize(have)
 
-  for toleration_path, toleration_check in tolerations.items():
+  for toleration_path, toleration_check in list(tolerations.items()):
     if fnmatchcase(path, toleration_path) and toleration_check(want, have):
       return
 

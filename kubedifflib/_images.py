@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from builtins import map
+from builtins import object
 import attr
 import json
 import optparse
@@ -66,8 +68,8 @@ def get_differing_images(source_env, target_env):
   # XXX: What about missing objects?
   diffs = {}
   for obj in source_objs & target_objs:
-    source_images = map(Image.parse, sorted(iter_images(source_env[obj])))
-    target_images = map(Image.parse, sorted(iter_images(target_env[obj])))
+    source_images = list(map(Image.parse, sorted(iter_images(source_env[obj]))))
+    target_images = list(map(Image.parse, sorted(iter_images(target_env[obj]))))
     while source_images and target_images:
       source, target = source_images[0], target_images[0]
       if source.name == target.name:
@@ -91,7 +93,7 @@ def iter_images(data):
   Expects 'data' to be Kubernetes object.
   """
   if isinstance(data, dict):
-    for key, value in data.iteritems():
+    for key, value in data.items():
       if key == 'image':
         yield value
       else:

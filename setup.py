@@ -16,7 +16,7 @@ setup(
     author_email='help@weave.works',
     license='Apache 2.0',
     packages=find_packages(),
-    install_requires=['PyYAML', 'attrs'],
+    install_requires=['PyYAML', 'attrs', 'future'],
     scripts=['kubediff', 'compare-images'],
     setup_requires=['pytest-runner',],
     tests_require=['pytest',],
