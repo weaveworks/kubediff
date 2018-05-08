@@ -18,4 +18,6 @@ setup(
     packages=find_packages(),
     install_requires=['PyYAML', 'attrs'],
     scripts=['kubediff', 'compare-images'],
+    setup_requires=['pytest-runner',],
+    tests_require=['pytest',],
 )
