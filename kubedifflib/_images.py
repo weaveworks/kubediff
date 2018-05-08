@@ -2,6 +2,7 @@
 
 from builtins import map
 from builtins import object
+from future.utils import viewitems
 import attr
 import json
 import optparse
@@ -93,7 +94,7 @@ def iter_images(data):
   Expects 'data' to be Kubernetes object.
   """
   if isinstance(data, dict):
-    for key, value in data.items():
+    for (key, value) in viewitems(data):
       if key == 'image':
         yield value
       else:
