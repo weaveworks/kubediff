@@ -1,3 +1,4 @@
+from __future__ import print_function
 from fnmatch import fnmatchcase
 from functools import partial
 import collections
@@ -151,7 +152,7 @@ def check_file(printer, path, config):
 
       try:
         running = kube_obj.get_from_cluster(config["kubeconfig"])
-      except subprocess.CalledProcessError, e:
+      except subprocess.CalledProcessError as e:
         printer.diff(path, Difference(e.output, None))
         differences += 1
         continue
@@ -165,10 +166,10 @@ def check_file(printer, path, config):
 
 class StdoutPrinter(object):
   def add(self, _, kube_obj):
-    print "Checking %s '%s'" % (kube_obj.kind, kube_obj.namespaced_name)
+    print("Checking %s '%s'" % (kube_obj.kind, kube_obj.namespaced_name))
 
   def diff(self, _, difference):
-    print " *** " + difference.to_text()
+    print(" *** " + difference.to_text())
 
   def finish(self):
     pass
@@ -214,7 +215,7 @@ class JSONPrinter(object):
     self.data[path].append(difference.to_text())
 
   def finish(self):
-    print json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': '))
+    print(json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
 def check_files(paths, printer, config):
