@@ -1,5 +1,4 @@
 FROM alpine:3.5
-MAINTAINER Weaveworks Inc <help@weave.works>
 WORKDIR /
 
 RUN apk update && \
@@ -14,3 +13,10 @@ RUN pip install -r /tmp/kubediff/requirements.txt
 COPY prom-run kubediff compare-images /
 EXPOSE 80
 ENTRYPOINT ["/prom-run"]
+
+ARG revision
+LABEL maintainer="Weaveworks <help@weave.works>" \
+      org.opencontainers.image.title="kubediff" \
+      org.opencontainers.image.source="https://github.com/weaveworks/kubediff" \
+      org.opencontainers.image.revision="${revision}" \
+      org.opencontainers.image.vendor="Weaveworks"
