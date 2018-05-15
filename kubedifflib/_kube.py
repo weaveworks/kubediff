@@ -29,6 +29,7 @@ class KubeObject(object):
   namespace = attr.ib()
   kind = attr.ib()
   name = attr.ib()
+  data = attr.ib()
 
   @classmethod
   def from_dict(cls, data, namespace=""):
@@ -39,9 +40,14 @@ class KubeObject(object):
     :param str namespace: the namespace to use if it's not defined in the object definition
     """
     kind = data["kind"]
-    name = data["metadata"]["name"]
-    namespace = data["metadata"].get("namespace", namespace)
-    return cls(namespace, kind, name)
+    if kind.lower() == "list":
+      for obj in data["items"]:
+        for kube_obj in KubeObject.from_dict(obj, namespace=namespace):
+          yield kube_obj
+    else:
+      name = data["metadata"]["name"]
+      namespace = data["metadata"].get("namespace", namespace)
+      yield cls(namespace, kind, name, data)
 
   @property
   def namespaced_name(self):
