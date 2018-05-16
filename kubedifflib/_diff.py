@@ -145,6 +145,8 @@ def check_file(printer, path, config):
 
     differences = 0
     for data in expected:
+      if data is None:
+        continue
       kube_obj = KubeObject.from_dict(data, config["namespace"])
 
       printer.add(path, kube_obj)
