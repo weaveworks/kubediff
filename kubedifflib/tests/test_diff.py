@@ -3,9 +3,10 @@ import copy
 import random
 
 from hypothesis import given
-from hypothesis.strategies import integers, lists, text
+from hypothesis.strategies import integers, lists, text, fixed_dictionaries, sampled_from, none, one_of
 
 from kubedifflib._diff import diff_lists, list_subtract
+from kubedifflib._kube import KubeObject
 
 
 @given(path=text(), xs=lists(integers()))
@@ -95,3 +96,58 @@ def test_two_lists_of_same_size_generator(items):
     """two_lists_of_same_size returns two lists of the same length."""
     xs, ys = items
     assert len(xs) == len(ys)
+
+
+def kube_spec():
+    """
+    Generate a random kubernetes spec
+    """
+    return fixed_dictionaries({
+        "name": text()
+    })
+
+
+def kube_obj():
+    """
+    Generate a random Kubernetes object
+    """
+    return fixed_dictionaries({
+        "apiVersion": sampled_from(["v1", "v1beta1", "extensions/v1"]),
+        "kind": sampled_from(["Namespace", "Pod", "Job", "CronJob", "Deployment"]),
+        "metadata": fixed_dictionaries({
+            "name": text()
+        }),
+        "spec": one_of(none(), kube_spec())
+    })
+
+
+def kube_list():
+    """
+    Generate a Kubernetes List type with a set of objects
+    """
+    return fixed_dictionaries({
+        "apiVersion": sampled_from(["v1", "v1beta1"]),
+        "kind": sampled_from(["List"]),
+        "items": lists(kube_obj(), min_size=1)
+    })
+
+
+@given(data=kube_list())
+def test_from_dict_kubernetes_list_type(data):
+    """
+    KubeObject.from_dict parses kubernetes lists correctly, by returning each of the
+    items in the list.
+    """
+    for index, kube_obj in enumerate(KubeObject.from_dict(data)):
+        assert kube_obj.data == data['items'][index]
+    assert index == len(data['items']) - 1
+
+
+@given(data=kube_obj())
+def test_from_dict_kubernetes_obj_type(data):
+    """
+    KubeObject.from_dict parses regular kubernetes objects correctly.
+    """
+    for index, kube_obj in enumerate(KubeObject.from_dict(data)):
+        assert kube_obj.data == data
+    assert index == 0
