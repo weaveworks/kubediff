@@ -151,22 +151,25 @@ def check_file(printer, path, config):
 
     differences = 0
     for data in expected:
-      kube_obj = KubeObject.from_dict(data, config["namespace"])
-
-      printer.add(path, kube_obj)
-
       try:
-        running = kube_obj.get_from_cluster(config["kubeconfig"])
-      except subprocess.CalledProcessError as e:
-        printer.diff(path, Difference(e.output, None))
-        differences += 1
-        continue
+        for kube_obj in KubeObject.from_dict(data, config["namespace"]):
+          printer.add(path, kube_obj)
 
+          try:
+            running = kube_obj.get_from_cluster(config["kubeconfig"])
+          except subprocess.CalledProcessError, e:
+            printer.diff(path, Difference(e.output, None))
+            differences += 1
+            continue
 
-      for difference in diff("", data, running):
-        differences += 1
-        printer.diff(path, difference)
-  return differences
+          for difference in diff("", kube_obj.data, running):
+            differences += 1
+            printer.diff(path, difference)
+      except Exception:
+        print("Failed parsing %s." % (path))
+        raise
+
+    return differences
 
 
 class StdoutPrinter(object):
