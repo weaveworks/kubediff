@@ -99,18 +99,14 @@ def test_two_lists_of_same_size_generator(items):
 
 
 def kube_spec():
-    """
-    Generate a random kubernetes spec
-    """
+    """Generate a random kubernetes spec."""
     return fixed_dictionaries({
         "name": text()
     })
 
 
 def kube_obj():
-    """
-    Generate a random Kubernetes object
-    """
+    """Generate a random Kubernetes object."""
     return fixed_dictionaries({
         "apiVersion": sampled_from(["v1", "v1beta1", "extensions/v1"]),
         "kind": sampled_from(["Namespace", "Pod", "Job", "CronJob", "Deployment"]),
@@ -122,9 +118,7 @@ def kube_obj():
 
 
 def kube_list():
-    """
-    Generate a Kubernetes List type with a set of objects
-    """
+    """Generate a Kubernetes List type with a set of objects."""
     return fixed_dictionaries({
         "apiVersion": sampled_from(["v1", "v1beta1"]),
         "kind": sampled_from(["List"]),
@@ -134,20 +128,12 @@ def kube_list():
 
 @given(data=kube_list())
 def test_from_dict_kubernetes_list_type(data):
-    """
-    KubeObject.from_dict parses kubernetes lists correctly, by returning each of the
-    items in the list.
-    """
-    for index, kube_obj in enumerate(KubeObject.from_dict(data)):
-        assert kube_obj.data == data['items'][index]
-    assert index == len(data['items']) - 1
+    """KubeObject.from_dict parses kubernetes lists by returning each of the
+    items in the list."""
+    assert [kube_obj.data for kube_obj in KubeObject.from_dict(data)] == data['items']
 
 
 @given(data=kube_obj())
 def test_from_dict_kubernetes_obj_type(data):
-    """
-    KubeObject.from_dict parses regular kubernetes objects correctly.
-    """
-    for index, kube_obj in enumerate(KubeObject.from_dict(data)):
-        assert kube_obj.data == data
-    assert index == 0
+    """KubeObject.from_dict parses regular kubernetes objects."""
+    assert [kube_obj.data for kube_obj in KubeObject.from_dict(data)] == [data]
