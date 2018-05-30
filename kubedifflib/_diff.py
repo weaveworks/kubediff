@@ -1,3 +1,9 @@
+from __future__ import print_function
+from __future__ import division
+from builtins import str
+from past.builtins import basestring
+from builtins import object
+from future.utils import listitems, viewitems
 from fnmatch import fnmatchcase
 from functools import partial
 import collections
@@ -87,7 +93,7 @@ def list_subtract(xs, ys, equality=operator.eq):
 
 
 def diff_dicts(path, want, have):
-  for k, want_v in want.iteritems():
+  for (k, want_v) in viewitems(want):
     key_path = "%s.%s" % (path, k)
 
     if k not in have:
@@ -109,7 +115,7 @@ def diff(path, want, have):
   want = normalize(want)
   have = normalize(have)
 
-  for toleration_path, toleration_check in tolerations.items():
+  for (toleration_path, toleration_check) in listitems(tolerations):
     if fnmatchcase(path, toleration_path) and toleration_check(want, have):
       return
 
@@ -168,10 +174,10 @@ def check_file(printer, path, config):
 
 class StdoutPrinter(object):
   def add(self, _, kube_obj):
-    print "Checking %s '%s'" % (kube_obj.kind, kube_obj.namespaced_name)
+    print("Checking %s '%s'" % (kube_obj.kind, kube_obj.namespaced_name))
 
   def diff(self, _, difference):
-    print " *** " + difference.to_text()
+    print(" *** " + difference.to_text())
 
   def finish(self):
     pass
@@ -198,9 +204,7 @@ class QuietTextPrinter(object):
     else:
       self._write('## UNKNOWN')
     self._write('')
-    self._stream.write(difference.to_text())
-    self._stream.write('\n')
-    self._stream.flush()
+    self._write('%s', difference.to_text())
 
   def finish(self):
     pass
@@ -217,7 +221,7 @@ class JSONPrinter(object):
     self.data[path].append(difference.to_text())
 
   def finish(self):
-    print json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': '))
+    print(json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
 def check_files(paths, printer, config):

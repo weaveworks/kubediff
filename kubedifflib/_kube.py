@@ -1,3 +1,4 @@
+from builtins import object
 import attr
 import os
 import subprocess
