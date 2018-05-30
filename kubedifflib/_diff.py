@@ -166,7 +166,7 @@ def check_file(printer, path, config):
             differences += 1
             printer.diff(path, difference)
       except Exception:
-        print "Failed parsing %s." % (path)
+        print("Failed parsing %s." % (path))
         raise
 
     return differences
