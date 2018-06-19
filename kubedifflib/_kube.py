@@ -46,6 +46,15 @@ class KubeObject(object):
         for kube_obj in KubeObject.from_dict(obj, namespace=namespace):
           yield kube_obj
     else:
+      # Transform from e.g. "apps/v1" to what kubectl expects, e.g. "deployment.v1.apps"
+      # From https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get:
+      # "To use a specific API version, fully-qualify the resource,
+      # version, and group (for example: 'jobs.v1.batch/myjob')."
+      api_version_parts = data["apiVersion"].split("/")
+      api_version_parts.reverse()
+      if len(api_version_parts) < 2:
+        api_version_parts.append("") # top-level group is blank
+      kind = kind + "." + ".".join(api_version_parts)
       name = data["metadata"]["name"]
       namespace = data["metadata"].get("namespace", namespace)
       yield cls(namespace, kind, name, data)
