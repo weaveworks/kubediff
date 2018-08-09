@@ -1,3 +1,4 @@
 attrs
 pyyaml
 tabulate
+future
