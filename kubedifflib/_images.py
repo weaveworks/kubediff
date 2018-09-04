@@ -23,11 +23,11 @@ def load_config(*paths):
   :return: a dict mapping KubeObjects to data.
   """
   objects = {}
-  for filename in iter_files(paths):
+  for path in iter_files(paths):
     _, extension = os.path.splitext(path)
     if extension not in [".yaml", ".yml"]:
       continue
-    with open(filename, 'r') as stream:
+    with open(path, 'r') as stream:
       data = yaml.load(stream)
     kube_obj = KubeObject.from_dict(data)
     objects[kube_obj] = data
