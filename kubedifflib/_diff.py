@@ -157,7 +157,7 @@ def check_file(printer, path, config):
 
           try:
             running = kube_obj.get_from_cluster(config["kubeconfig"])
-          except subprocess.CalledProcessError, e:
+          except subprocess.CalledProcessError as e:
             printer.diff(path, Difference(e.output, None))
             differences += 1
             continue
