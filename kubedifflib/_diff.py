@@ -151,6 +151,9 @@ def check_file(printer, path, config):
 
     differences = 0
     for data in expected:
+      # data can be None, e.g. in cases where the doc ends with a '---'
+      if not data:
+        continue
       try:
         for kube_obj in KubeObject.from_dict(data, config["namespace"]):
           printer.add(path, kube_obj)
