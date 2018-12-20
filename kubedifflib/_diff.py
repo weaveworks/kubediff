@@ -30,8 +30,12 @@ class Difference(object):
     self.path = path
     self.args = args
 
-  def to_text(self):
-    message = self.message % self.args
+  def to_text(self, kind=''):
+    if 'secret' in kind.lower() and len(self.args) == 2:
+      message = self.message % ((len(self.args[0]) * '*'), (len(self.args[1]) * '*'))
+
+    else:
+      message = self.message % self.args
     if self.path is None:
       return message
     return '%s: %s' % (self.path, message)
@@ -207,7 +211,7 @@ class QuietTextPrinter(object):
     else:
       self._write('## UNKNOWN')
     self._write('')
-    self._write('%s', difference.to_text())
+    self._write('%s', difference.to_text(self._current.kind))
 
   def finish(self):
     pass
