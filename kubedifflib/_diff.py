@@ -37,7 +37,7 @@ class Difference(object):
     self.args = args
 
   def to_text(self, kind=''):
-    if 'secret' in kind.lower() and len(self.args) == 2:
+    if kind.startswith('Secret.') and len(self.args) == 2:
       message = self.message % (mask(self.args[0]), mask(self.args[1]))
 
     else:
