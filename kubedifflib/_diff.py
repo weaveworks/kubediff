@@ -21,6 +21,12 @@ from ._kube import (
   iter_files,
 )
 
+def mask(x):
+  """Turn a string into an equal-length string of asterisks"""
+  try:
+    return len(x) * '*'
+  except TypeError: # not a string - perhaps None - just return it as-is
+    return x
 
 class Difference(object):
   """An observed difference."""
@@ -32,7 +38,7 @@ class Difference(object):
 
   def to_text(self, kind=''):
     if 'secret' in kind.lower() and len(self.args) == 2:
-      message = self.message % ((len(self.args[0]) * '*'), (len(self.args[1]) * '*'))
+      message = self.message % (mask(self.args[0]), mask(self.args[1]))
 
     else:
       message = self.message % self.args
