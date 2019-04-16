@@ -28,7 +28,7 @@ def load_config(*paths):
     if extension not in [".yaml", ".yml"]:
       continue
     with open(path, 'r') as stream:
-      data = yaml.load(stream)
+      data = yaml.safe_load(stream)
     kube_obj = KubeObject.from_dict(data)
     objects[kube_obj] = data
   return objects
