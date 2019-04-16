@@ -157,7 +157,7 @@ def check_file(printer, path, config):
   :return: Number of differences found.
   """
   with open(path, 'r') as stream:
-    expected = yaml.load_all(stream)
+    expected = yaml.safe_load_all(stream)
 
     differences = 0
     for data in expected:
