@@ -75,4 +75,4 @@ class KubeObject(object):
       args.append("--kubeconfig=%s" % kubeconfig)
 
     running = subprocess.check_output(["kubectl", "get"] + args + [self.kind, self.name], stderr=subprocess.STDOUT)
-    return yaml.load(running)
+    return yaml.safe_load(running)
