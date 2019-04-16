@@ -31,7 +31,7 @@ jobs:
     - deploy:
         command: |
           if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
             docker push weaveworks/kubediff:$(./tools/image-tag)
             docker push weaveworks/kubediff:latest
             docker login -u "$QUAY_USER" -p "$QUAY_PASSWORD" quay.io
