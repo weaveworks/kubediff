@@ -44,8 +44,6 @@ $(VIRTUALENV_BIN)/flake8 $(VIRTUALENV_BIN)/py.test: $(DEPS_UPTODATE)
 .uptodate: prom-run Dockerfile
 	docker build --build-arg=revision=$(GIT_REVISION) -t weaveworks/kubediff .
 	docker tag weaveworks/kubediff:latest weaveworks/kubediff:$(IMAGE_VERSION)
-	docker tag weaveworks/kubediff:$(IMAGE_VERSION) quay.io/weaveworks/kubediff:$(IMAGE_VERSION)
-	docker tag weaveworks/kubediff:latest quay.io/weaveworks/kubediff:latest
 
 prom-run: vendor/github.com/tomwilkie/prom-run/*.go
 	CGO_ENABLED=0 GOOS=linux go build ./vendor/github.com/tomwilkie/prom-run
