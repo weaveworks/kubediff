@@ -18,6 +18,7 @@ Kubediff can be run from the command line:
       -h, --help            show this help message and exit
       --kubeconfig=KUBECONFIG
                             path to kubeconfig
+      --context=CONTEXT     name of kubeconfig context to use
       --namespace=NAMESPACE
                             the namespace to assume for objects where it's not
                             specified (default = Kubernetes default for current

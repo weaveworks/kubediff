@@ -19,6 +19,7 @@ appropriate environment.  This tools runs kubectl, so unless your
 ~/.kube/config is configured for the correct environment, you will need to
 supply the kubeconfig for the appropriate environment.""")
   parser.add_option("--kubeconfig", help="path to kubeconfig")
+  parser.add_option("--context", help="name of kubeconfig context to use")
   parser.add_option("--namespace",
                     help="the namespace to assume for objects where it's not specified (default = Kubernetes default for current context)",
                     default="")
@@ -36,7 +37,8 @@ supply the kubeconfig for the appropriate environment.""")
 
   config = {
       "kubeconfig": options.kubeconfig,
-      "namespace": options.namespace
+      "namespace": options.namespace,
+      "context": options.context
   }
 
   failed = check_files(args, printer, config)
