@@ -27,13 +27,14 @@ def iter_files(paths):
 class KubeObject(object):
   """A Kubernetes object."""
 
+  context = attr.ib()
   namespace = attr.ib()
   kind = attr.ib()
   name = attr.ib()
   data = attr.ib()
 
   @classmethod
-  def from_dict(cls, data, namespace=""):
+  def from_dict(cls, data, context="", namespace=""):
     """Construct a 'KubeObject' from a dictionary of Kubernetes data.
 
     :param dict data: Kubernetes object data; might be obtained from a Kubernetes cluster,
@@ -43,7 +44,7 @@ class KubeObject(object):
     kind = data["kind"]
     if kind.lower() == "list":
       for obj in data["items"]:
-        for kube_obj in KubeObject.from_dict(obj, namespace=namespace):
+        for kube_obj in KubeObject.from_dict(obj, context=context, namespace=namespace):
           yield kube_obj
     else:
       # Transform from e.g. "apps/v1" to what kubectl expects, e.g. "deployment.v1.apps"
@@ -57,7 +58,8 @@ class KubeObject(object):
       kind = kind + "." + ".".join(api_version_parts)
       name = data["metadata"]["name"]
       namespace = data["metadata"].get("namespace", namespace)
-      yield cls(namespace, kind, name, data)
+      context = data["metadata"].get("context", context)
+      yield cls(context,namespace, kind, name, data)
 
   @property
   def namespaced_name(self):
@@ -70,7 +72,12 @@ class KubeObject(object):
         fetches data from the default cluster.
     :return: A dict of data for this Kubernetes object.
     """
-    args = ["--namespace=%s" % self.namespace, "-o=yaml"]
+    args=[]
+    if self.context is not None:
+      args = ["--context=%s" % self.context ,"--namespace=%s" % self.namespace, "-o=yaml"]
+    else:
+      args = ["--namespace=%s" % self.namespace, "-o=yaml"]
+
     if kubeconfig is not None:
       args.append("--kubeconfig=%s" % kubeconfig)
 
