@@ -84,8 +84,8 @@ def diff_lists(path, want, have):
   def eq(x, y):
     return len(list(diff('', x, y))) == 0
 
-  for i in list_subtract(want, have, eq):
-    yield missing_item(path, "element [%d]" % i)
+  for (i,x) in list_subtract(want, have, eq):
+    yield missing_item(path, "element [%d] => %s" % (i,x))
 
 
 def list_subtract(xs, ys, equality=operator.eq):
@@ -99,7 +99,7 @@ def list_subtract(xs, ys, equality=operator.eq):
         matched.add(j)
         break
     else:
-      yield i
+      yield (i,x)
 
 
 def diff_dicts(path, want, have):
