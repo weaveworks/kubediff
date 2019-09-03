@@ -1,7 +1,7 @@
 .PHONY: all clean lint test clean-deps deps
 .DEFAULT_GOAL := all
 
-all: .uptodate lint test
+all: test lint .uptodate
 
 IMAGE_VERSION := $(shell ./tools/image-tag)
 GIT_REVISION := $(shell git rev-parse HEAD)
