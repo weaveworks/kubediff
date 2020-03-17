@@ -9,3 +9,4 @@ prom-run
 /.env
 /.tox
 /.pytest_cache
+/.eggs
