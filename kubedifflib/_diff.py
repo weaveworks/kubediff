@@ -54,6 +54,14 @@ def cpus_equal(a, b):
   parse = lambda x: int(x[:-1])/1000. if x.endswith('m') else float(x)
   return parse(a) == parse(b)
 
+# Kubernetes outputs "creationTimestamp: null" in a blank object
+# e.g. from kubectl create deploy foo --image=foo --output=yaml --dry-run
+# so allow that to compare equal to any real value that comes back.
+def creation_timestamp_equal(a, b):
+  """Compares creation timestamps, allowing a source value of None to match any time"""
+  if a is None:
+    return True
+  return a == b
 
 # Tolerations specify a path (glob patterns accepted) and a check function.
 # The check function takes (want, have) and is called on matching paths.
@@ -61,6 +69,7 @@ def cpus_equal(a, b):
 tolerations = {
   "*.resources.requests.cpu": cpus_equal,
   "*.resources.limits.cpu": cpus_equal,
+  ".metadata.creationTimestamp": creation_timestamp_equal,
 }
 
 
