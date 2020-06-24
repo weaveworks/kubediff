@@ -41,7 +41,7 @@ class KubeObject(object):
     :param str namespace: the namespace to use if it's not defined in the object definition
     """
     kind = data["kind"]
-    if kind.lower() == "list":
+    if kind.lower().endswith("list"):
       for obj in data["items"]:
         for kube_obj in KubeObject.from_dict(obj, namespace=namespace):
           yield kube_obj
