@@ -43,7 +43,7 @@ latest configuration from Github, comparing it to the running configuration.  In
 this mode Kubediff will also offers a very simple UI showing the output and
 export the result to Prometheus, all courtesy to [prom-run](https://github.com/tomwilkie/prom-run).
 
-To deploy to Kubernetes, you much first make a copy of the YAML files in `k8s`
+To deploy to Kubernetes, you much first make a copy of the YAML files in `k8s/k8s-vanilla` or `k8s/k8s-kustomize` if using kustomize
 and update the following fields:
 
 - `kubediff-rc.yaml` the first argument to git-sync must be the location of

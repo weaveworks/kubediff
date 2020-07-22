@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-name: kubediff
+    meta.helm.sh/release-namespace: kubediff
+  name: kubediff
+  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterrolebindings/kubediff
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubediff
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: kubediff

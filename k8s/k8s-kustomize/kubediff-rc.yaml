@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: kubediff
+  namespace: kubediff
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: kubediff
+    spec:
+      volumes:
+      - name: repo
+        emptyDir: {}
+      containers:
+      - name: git-sync
+        # These is an official google build of git-sync, but its out of date
+        # wrt private repos.  Also git-sync is a pain to integrate with our
+        # build (uses godeps etc).  So for not, use a pinned custom built
+        # version.
+        image: k8s.gcr.io/git-sync:v3.1.6
+        args:
+          - -repo=https://github.com/<your repo here>
+          - -branch=prod
+          - -wait=60
+        volumeMounts:
+        - name: repo
+          mountPath: /tmp/git
+      - name: kubediff
+        image: sdpequinor/kubediff:0.1.0
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh","-c"]
+        args:
+        - sleep 5 && /kustomize build /data/<your kustomization.yaml folder here> > /gityaml.yaml;
+          /prom-run --period=60s --listen-addr=:80 /kubediff /gityaml.yaml;
+        volumeMounts:
+        - name: repo
+          mountPath: /data
+        ports:
+        - containerPort: 80
