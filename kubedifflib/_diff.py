@@ -15,6 +15,7 @@ import os
 import subprocess
 import sys
 import yaml
+import re
 
 from ._kube import (
   KubeObject,
@@ -93,8 +94,29 @@ def diff_lists(path, want, have):
   def eq(x, y):
     return len(list(diff('', x, y))) == 0
 
-  for i in list_subtract(want, have, eq):
-    yield missing_item(path, "element [%d]" % i)
+  if re.match('^\.spec\.template\.spec\.containers\[\d+\]\.env$', path):
+    in_want = set(map(lambda x: x['name'], want))
+    in_have = set(map(lambda x: x['name'], have))
+    in_both = in_want & in_have
+    in_want_only = in_want - in_both
+    in_have_only = in_have - in_both
+
+    for i in in_want_only:
+      yield Difference("Diff: {} in wished config only".format(i), path)
+
+    for i in in_have_only:
+      yield Difference("Diff: {} in running config only".format(i), path)
+
+    want_in_both = filter(lambda x: x['name'] in in_both, want)
+    have_in_both = filter(lambda x: x['name'] in in_both, have)
+
+    for i, (want_v, have_v) in enumerate(zip(want_in_both, have_in_both)):
+      for difference in diff("%s[%d]" % (path, i), want_v, have_v):
+        yield difference
+
+  else:
+    for i in list_subtract(want, have, eq):
+      yield missing_item(path, "element [%d]" % i)
 
 
 def list_subtract(xs, ys, equality=operator.eq):
