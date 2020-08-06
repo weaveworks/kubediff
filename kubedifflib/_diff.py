@@ -94,7 +94,7 @@ def diff_lists(path, want, have):
   def eq(x, y):
     return len(list(diff('', x, y))) == 0
 
-  if re.match('^\.spec\.template\.spec\.containers\[\d+\]\.env$', path):
+  if re.match('^\.spec\.template\.spec\.(containers|volumes)(\[\d+\])?(\.env)?$', path):
     in_want = set(map(lambda x: x['name'], want))
     in_have = set(map(lambda x: x['name'], have))
     in_both = in_want & in_have
