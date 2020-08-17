@@ -94,9 +94,21 @@ def diff_lists(path, want, have):
   def eq(x, y):
     return len(list(diff('', x, y))) == 0
 
-  if re.match('\.spec\.template\.spec\.(containers|volumes)(\[\d+\])?(\.env)?$', path):
-    in_want = set(map(lambda x: x['name'], want))
-    in_have = set(map(lambda x: x['name'], have))
+  key = 'name'
+  if re.match('\.spec\.rules\[\d+\]\.http', path):
+    key = 'paths'
+  if re.match('\.spec\.rules\[\d+\]\.http\.paths', path):
+    key = 'serviceName'
+  elif re.match('\.spec\.rules$', path):
+    key = 'host'
+  elif re.match('\.spec\.ports', path):
+    key = 'targetPort'
+  if re.match('\.spec\.template\.spec\.(containers|imagePullSecrets|volumes)(\[\d+\])?(\.env|\.ports)?$', path) \
+    or re.match('\.spec\.rules$\[\d+\]\.http$', path) \
+    or re.match('\.spec\.rules$', path) \
+    or re.match('\.spec\.ports', path):
+    in_want = set(map(lambda x: x[key], want))
+    in_have = set(map(lambda x: x[key], have))
     in_both = in_want & in_have
     in_want_only = in_want - in_both
     in_have_only = in_have - in_both
@@ -107,8 +119,8 @@ def diff_lists(path, want, have):
     for i in in_have_only:
       yield Difference("Diff: {} in running config only".format(i), path)
 
-    want_in_both = filter(lambda x: x['name'] in in_both, want)
-    have_in_both = filter(lambda x: x['name'] in in_both, have)
+    want_in_both = filter(lambda x: x[key] in in_both, want)
+    have_in_both = filter(lambda x: x[key] in in_both, have)
 
     for i, (want_v, have_v) in enumerate(zip(want_in_both, have_in_both)):
       for difference in diff("%s[%d]" % (path, i), want_v, have_v):
