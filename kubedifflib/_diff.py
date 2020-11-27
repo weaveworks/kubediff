@@ -1,6 +1,4 @@
 from builtins import str
-from past.builtins import basestring
-from future.utils import listitems, viewitems
 from fnmatch import fnmatchcase
 from functools import partial
 import collections
@@ -86,8 +84,9 @@ not_equal = partial(Difference, "'%s' != '%s'")
 
 def diff_not_equal(path, want, have):
     want_lines, have_lines = want.splitlines(), have.splitlines()
-    diff = "\n".join(difflib.unified_diff(want_lines, have_lines, fromfile=path, tofile="running", lineterm=""))
-    return Difference("Diff:\n%s", path, diff)
+    diffne = "\n".join(difflib.unified_diff(want_lines, have_lines,
+                                            fromfile=path, tofile="running", lineterm=""))
+    return Difference("Diff:\n%s", path, diffne)
 
 
 def diff_lists(path, want, have):
@@ -116,7 +115,7 @@ def list_subtract(xs, ys, equality=operator.eq):
 
 
 def diff_dicts(path, want, have):
-    for (k, want_v) in viewitems(want):
+    for (k, want_v) in want.items():
         key_path = "%s.%s" % (path, k)
 
         if k not in have:
@@ -129,7 +128,7 @@ def diff_dicts(path, want, have):
 def normalize(value):
     if isinstance(value, numbers.Number):
         return str(value)
-    if value == [] or value == {}:
+    if value in ([], {}):
         return None
     return value
 
@@ -138,7 +137,7 @@ def diff(path, want, have):
     want = normalize(want)
     have = normalize(have)
 
-    for (toleration_path, toleration_check) in listitems(tolerations):
+    for (toleration_path, toleration_check) in list(tolerations.items()):
         if fnmatchcase(path, toleration_path) and toleration_check(want, have):
             return
 
@@ -150,7 +149,7 @@ def diff(path, want, have):
         for difference in diff_lists(path, want, have):
             yield difference
 
-    elif isinstance(want, basestring) and isinstance(have, basestring):
+    elif isinstance(want, str) and isinstance(have, str):
         if want != have:
             if "\n" in want:
                 yield diff_not_equal(path, want, have)
@@ -230,7 +229,12 @@ class QuietTextPrinter():
         else:
             self._write('## UNKNOWN')
         self._write('')
-        self._write('%s', difference.to_text(self._current.kind).decode('utf-8'))
+        try:
+            self._write('%s', difference.to_text(self._current.kind).decode('utf-8'))
+        except AttributeError:
+            self._write('%s', difference.to_text(self._current.kind))
+        else:
+            pass
 
     def finish(self):
         pass
@@ -244,7 +248,12 @@ class JSONPrinter():
         pass
 
     def diff(self, path, difference):
-        self.data[path].append(difference.to_text().decode('utf-8'))
+        try:
+            self.data[path].append(difference.to_text().decode('utf-8'))
+        except AttributeError:
+            self.data[path].append(difference.to_text())
+        else:
+            pass
 
     def finish(self):
         print(json.dumps(self.data, sort_keys=True, indent=2, separators=(',', ': ')))

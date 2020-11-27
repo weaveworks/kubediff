@@ -4,9 +4,9 @@ import optparse
 import sys
 
 from kubedifflib import (
-  check_files,
-  JSONPrinter,
-  QuietTextPrinter,
+    check_files,
+    JSONPrinter,
+    QuietTextPrinter,
 )
 
 
