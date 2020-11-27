@@ -1,7 +1,6 @@
-from builtins import object
-import attr
 import os
 import subprocess
+import attr
 import yaml
 
 
@@ -24,7 +23,7 @@ def iter_files(paths):
 
 
 @attr.s
-class KubeObject(object):
+class KubeObject():
     """A Kubernetes object."""
 
     namespace = attr.ib()

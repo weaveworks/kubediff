@@ -1,4 +1,3 @@
-from builtins import str
 from fnmatch import fnmatchcase
 from functools import partial
 import collections
