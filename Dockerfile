@@ -3,7 +3,7 @@ WORKDIR /
 
 RUN apk update && \
    apk add python3 py3-pip curl && \
-   curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.9/bin/linux/amd64/kubectl && \
+   curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.21.5/bin/linux/amd64/kubectl && \
    chmod u+x /bin/kubectl
 
 COPY . /tmp/kubediff/
