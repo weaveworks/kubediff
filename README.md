@@ -6,25 +6,33 @@ running configuration and your version controlled configuration.
 Kubediff can be run from the command line:
 
     $ ./kubediff
-    Usage: kubediff [options] <dir/file>...
+    usage: kubediff [-h] [--kubeconfig KUBECONFIG] [--context CONTEXT] [--namespace NAMESPACE] [--json] [--no-error-on-diff] [paths ...]
 
-    Compare yaml files in <dir> to running state in kubernetes and print the
-    differences.  This is useful to ensure you have applied all your changes to the
-    appropriate environment.  This tools runs kubectl, so unless your
-    ~/.kube/config is configured for the correct environment, you will need to
-    supply the kubeconfig for the appropriate environment.
+         _          _             _  _   __   __
+        | |__ _  _ | |__  ___  __| |(_) / _| / _|
+        | / /| || || '_ \/ -_)/ _` || ||  _||  _|
+        |_\_\ \_,_||_.__/\___|\__,_||_||_|  |_|
 
-    Options:
+        Compare yaml files in path(s) to running state in kubernetes and print the
+        differences. This is useful to ensure you have applied all your changes
+        to the appropriate environment. This tools runs kubectl, so unless your
+        ~/.kube/config is configured for the correct environment, you will need
+        to supply the kubeconfig for the appropriate environment.
+
+    positional arguments:
+      paths                  path(s) from which kubediff will look for configuration files
+
+    optional arguments:
       -h, --help            show this help message and exit
-      --kubeconfig=KUBECONFIG
+      --kubeconfig KUBECONFIG, -k KUBECONFIG
                             path to kubeconfig
-      --context=CONTEXT     name of kubeconfig context to use
-      --namespace=NAMESPACE
-                            the namespace to assume for objects where it's not
-                            specified (default = Kubernetes default for current
-                            context)
-      -j, --json            output in json format
-      --no-error-on-diff    don't exit with 2 if diff exists
+      --context CONTEXT, -c CONTEXT
+                            name of kubeconfig context to use
+      --namespace NAMESPACE, -n NAMESPACE
+                            Namespace to assume for objects where it is not specified (default = Kubernetes default for current context)
+      --json, -j            output in json format
+      --no-error-on-diff, -e
+                            don't exit with 2 if diff exists
 
 For example:
 
@@ -60,9 +68,9 @@ the service:
     secret "kubediff-secret" created
     service "kubediff" created
 
-And to view the UI, run the follow command and go to http://localhost:4040
+And to view the UI, run the follow command and go to [http://localhost:4040](http://localhost:4040)
 
-    $ kubectl port-forward $(kubectl get pod --selector=name=kubediff -o jsonpath={.items..metadata.name}) 4040:80
+    `$ kubectl port-forward $(kubectl get pod --selector=name=kubediff -o jsonpath={.items..metadata.name}) 4040:80`
 
 ![Kubediff Screenshot](/imgs/screenshot.png)
 
@@ -87,29 +95,25 @@ These alerts can be sent to Slack, for example:
 To quickly see how two sets of configurations differ, purely in terms of
 images:
 
-```
-$ ./compare-images ../service-conf/k8s/dev/ ../service-conf/k8s/prod/
-Image                          dev                   prod
------------------------------  --------------------  --------------------
-quay.io/weaveworks/grafana     master-0fc7cc2        master-08fd09d
-quay.io/weaveworks/prometheus  master-0fc7cc2        master-4fb2aed
-quay.io/weaveworks/ui-server   master-2899c36        master-45d67b3
-tomwilkie/prometheus           frankenstein-8a5ec1b  frankenstein-ebe5808
-weaveworks/scope               master-1a1021c        master-14d0e4e
-```
+    $ ./compare-images ../service-conf/k8s/dev/ ../service-conf/k8s/prod/
+    Image                          dev                   prod
+    -----------------------------  --------------------  --------------------
+    quay.io/weaveworks/grafana     master-0fc7cc2        master-08fd09d
+    quay.io/weaveworks/prometheus  master-0fc7cc2        master-4fb2aed
+    quay.io/weaveworks/ui-server   master-2899c36        master-45d67b3
+    tomwilkie/prometheus           frankenstein-8a5ec1b  frankenstein-ebe5808
+    weaveworks/scope               master-1a1021c        master-14d0e4e
 
 ## Build
 
-```
-mkdir -p $GOPATH/src/github.com/prometheus && cd "$_"
-git clone git@github.com:prometheus/client_golang.git
-mkdir -p $GOPATH/src/github.com/weaveworks && cd "$_"
-git clone git@github.com:weaveworks/kubediff.git
-cd kubediff
-make
-```
+    mkdir -p $GOPATH/src/github.com/prometheus && cd "$_"
+    git clone git@github.com:prometheus/client_golang.git
+    mkdir -p $GOPATH/src/github.com/weaveworks && cd "$_"
+    git clone git@github.com:weaveworks/kubediff.git
+    cd kubediff
+    make
 
-## <a name="help"></a>Getting Help
+## Getting Help
 
 If you have any questions about, feedback for or problems with `kubediff`:
 

@@ -1,50 +1,99 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import optparse
+from __future__ import (division, absolute_import, print_function,
+                        unicode_literals)
+
+import argparse
 import sys
 
 from kubedifflib import (
-  check_files,
-  JSONPrinter,
-  QuietTextPrinter,
+    check_files,
+    JSONPrinter,
+    QuietTextPrinter,
 )
 
 
+class ParseArgs():
+    def __init__(self):
+
+        # Parse arguments passed at cli
+        self.parse_arguments()
+
+    def parse_arguments(self):
+
+        description = '''
+     _          _             _  _   __   __
+    | |__ _  _ | |__  ___  __| |(_) / _| / _|
+    | / /| || || '_ \\/ -_)/ _` || ||  _||  _|
+    |_\\_\\ \\_,_||_.__/\\___|\\__,_||_||_|  |_|
+
+    Compare yaml files in path(s) to running state in kubernetes and print the
+    differences. This is useful to ensure you have applied all your changes
+    to the appropriate environment. This tools runs kubectl, so unless your
+    ~/.kube/config is configured for the correct environment, you will need
+    to supply the kubeconfig for the appropriate environment.'''
+
+        parser = argparse.ArgumentParser(description=description,
+                                         formatter_class=argparse.RawTextHelpFormatter)
+
+        parser.add_argument('--kubeconfig',
+                            '-k',
+                            help='path to kubeconfig')
+
+        parser.add_argument('--context',
+                            '-c',
+                            help='name of kubeconfig context to use')
+
+        parser.add_argument('--namespace',
+                            '-n',
+                            help=('Namespace to assume for objects where it is not '
+                                  'specified (default = Kubernetes default for '
+                                  'current context)'),
+                            default='default')
+
+        parser.add_argument('--json',
+                            '-j',
+                            help='output in json format',
+                            action='store_true',
+                            dest='json')
+
+        parser.add_argument('--no-error-on-diff',
+                            '-e',
+                            help='don\'t exit with 2 if diff exists',
+                            action='store_false',
+                            dest='exit_on_diff',
+                            default=True)
+
+        parser.add_argument('paths', nargs='*', help='path(s) from which '
+                            'kubediff will look for configuration files')
+
+        self.args = parser.parse_args()
+
+        if len(self.args.paths) == 0:
+            parser.print_help()
+            sys.exit(1)
+
+
 def main():
-  parser = optparse.OptionParser("""usage: %prog [options] <dir/file>...
 
-Compare yaml files in <dir> to running state in kubernetes and print the
-differences.  This is useful to ensure you have applied all your changes to the
-appropriate environment.  This tools runs kubectl, so unless your
-~/.kube/config is configured for the correct environment, you will need to
-supply the kubeconfig for the appropriate environment.""")
-  parser.add_option("--kubeconfig", help="path to kubeconfig")
-  parser.add_option("--context", help="name of kubeconfig context to use")
-  parser.add_option("--namespace",
-                    help="the namespace to assume for objects where it's not specified (default = Kubernetes default for current context)",
-                    default="")
-  parser.add_option("-j", "--json", help="output in json format", action="store_true", dest="json")
-  parser.add_option("--no-error-on-diff", help="don't exit with 2 if diff exists",
-                    action="store_false", dest="exit_on_diff", default="true")
-  (options, args) = parser.parse_args()
-  if len(args) == 0:
-    parser.print_help()
-    sys.exit(1)
+    options = ParseArgs()
+    print(options.args)
 
-  printer = QuietTextPrinter()
-  if options.json:
-    printer = JSONPrinter()
+    printer = QuietTextPrinter()
+    if options.args.json:
+        printer = JSONPrinter()
 
-  config = {
-      "kubeconfig": options.kubeconfig,
-      "namespace": options.namespace,
-      "context": options.context
-  }
+    config = {
+        "kubeconfig": options.args.kubeconfig,
+        "namespace": options.args.namespace,
+        "context": options.args.context
+    }
 
-  failed = check_files(args, printer, config)
-  if failed and options.exit_on_diff:
-    sys.exit(2)
+    failed = check_files(options.args.paths, printer, config)
+    if failed and options.args.exit_on_diff:
+        sys.exit(2)
 
 
 if __name__ == '__main__':
-  main()
+    main()
