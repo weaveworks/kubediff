@@ -2,13 +2,13 @@ FROM alpine:3.9
 WORKDIR /
 
 RUN apk update && \
-   apk add py2-pip curl && \
+   apk add python3 py3-pip curl && \
    curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.11.9/bin/linux/amd64/kubectl && \
    chmod u+x /bin/kubectl
 
 COPY . /tmp/kubediff/
-RUN pip install /tmp/kubediff/
-RUN pip install -r /tmp/kubediff/requirements.txt
+RUN pip3 install /tmp/kubediff/
+RUN pip3 install -r /tmp/kubediff/requirements.txt
 
 COPY prom-run kubediff compare-images /
 EXPOSE 80
@@ -16,7 +16,7 @@ ENTRYPOINT ["/prom-run"]
 
 ARG revision
 LABEL maintainer="Weaveworks <help@weave.works>" \
-      org.opencontainers.image.title="kubediff" \
-      org.opencontainers.image.source="https://github.com/weaveworks/kubediff" \
-      org.opencontainers.image.revision="${revision}" \
-      org.opencontainers.image.vendor="Weaveworks"
+   org.opencontainers.image.title="kubediff" \
+   org.opencontainers.image.source="https://github.com/weaveworks/kubediff" \
+   org.opencontainers.image.revision="${revision}" \
+   org.opencontainers.image.vendor="Weaveworks"
