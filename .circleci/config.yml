@@ -19,7 +19,7 @@ jobs:
     - run:
         name: Dependencies
         command: |
-          pip install virtualenv
+          pip3 install virtualenv
           make deps
     - run:
         name: make all
