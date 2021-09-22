@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: docker.io/weaveworks/build-golang:1.11.1-stretch
+      - image: docker.io/weaveworks/build-golang:1.14.4-stretch
     working_directory: /go/src/github.com/weaveworks/kubediff
     environment:
       GOPATH: /go
