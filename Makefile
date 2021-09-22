@@ -32,9 +32,9 @@ $(VIRTUALENV_BIN)/pip: .ensure-virtualenv
 	virtualenv $(VIRTUALENV_DIR)
 
 $(DEPS_UPTODATE): setup.py $(VIRTUALENV_BIN)/pip requirements.txt dev-requirements.txt
-	$(VIRTUALENV_BIN)/pip3 install -e .
-	$(VIRTUALENV_BIN)/pip3 install -r requirements.txt
-	$(VIRTUALENV_BIN)/pip3 install -r dev-requirements.txt
+	$(VIRTUALENV_BIN)/python -m pip install -e .
+	$(VIRTUALENV_BIN)/python -m pip install -r requirements.txt
+	$(VIRTUALENV_BIN)/python -m pip install -r dev-requirements.txt
 	touch $(DEPS_UPTODATE)
 
 deps: $(DEPS_UPTODATE)
