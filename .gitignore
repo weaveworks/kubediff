@@ -7,5 +7,6 @@ prom-run
 /.ensure-pip
 /.ensure-virtualenv
 /.env
+/.eggs
 /.tox
 /.pytest_cache
