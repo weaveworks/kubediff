@@ -28,10 +28,10 @@ jobs:
           make JUNIT_XML=test-results/tests/junit.xml all
     - store_test_results:
         path: test-results
-    - deploy:
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
-            docker push weaveworks/kubediff:$(./tools/image-tag)
-            docker push weaveworks/kubediff:latest
-          fi
+    # - deploy:
+    #     command: |
+    #       if [ "${CIRCLE_BRANCH}" == "master" ]; then
+    #         docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
+    #         docker push weaveworks/kubediff:$(./tools/image-tag)
+    #         docker push weaveworks/kubediff:latest
+    #       fi
