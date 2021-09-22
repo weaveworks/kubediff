@@ -12,7 +12,7 @@ VIRTUALENV_BIN = $(VIRTUALENV_DIR)/bin
 DEPS_UPTODATE = $(VIRTUALENV_DIR)/.deps-uptodate
 
 VIRTUALENV := $(shell command -v virtualenv 2> /dev/null)
-PIP := $(shell command -v pip 2> /dev/null)
+PIP := $(shell command -v pip3 2> /dev/null)
 
 JUNIT_XML := "junit.xml"
 
@@ -32,9 +32,9 @@ $(VIRTUALENV_BIN)/pip: .ensure-virtualenv
 	virtualenv $(VIRTUALENV_DIR)
 
 $(DEPS_UPTODATE): setup.py $(VIRTUALENV_BIN)/pip requirements.txt dev-requirements.txt
-	$(VIRTUALENV_BIN)/pip install -e .
-	$(VIRTUALENV_BIN)/pip install -r requirements.txt
-	$(VIRTUALENV_BIN)/pip install -r dev-requirements.txt
+	$(VIRTUALENV_BIN)/python -m pip install -e .
+	$(VIRTUALENV_BIN)/python -m pip install -r requirements.txt
+	$(VIRTUALENV_BIN)/python -m pip install -r dev-requirements.txt
 	touch $(DEPS_UPTODATE)
 
 deps: $(DEPS_UPTODATE)
