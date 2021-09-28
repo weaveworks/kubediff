@@ -2,25 +2,24 @@
 
 from __future__ import (division, absolute_import, print_function,
                         unicode_literals)
-from builtins import str
-from builtins import object
-from future.utils import listitems, viewitems
-from fnmatch import fnmatchcase
-from functools import partial
-import collections
-import difflib
-import json
-import numbers
-import operator
-import os
-import subprocess
-import sys
-import yaml
-
 from ._kube import (
     KubeObject,
     iter_files,
 )
+import yaml
+import sys
+import subprocess
+import os
+import operator
+import numbers
+import json
+import difflib
+import collections
+from functools import partial
+from fnmatch import fnmatchcase
+from future.utils import listitems, viewitems
+from builtins import object
+from builtins import str
 
 
 def mask(x):
