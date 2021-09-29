@@ -1,12 +1,13 @@
-import copy
+# -*- coding: utf-8 -*-
 
-import random
-
-from hypothesis import given, example
-from hypothesis.strategies import integers, lists, text, fixed_dictionaries, sampled_from, none, one_of
-
-from kubedifflib._diff import diff_lists, list_subtract, Difference
+from __future__ import (division, absolute_import, print_function,
+                        unicode_literals)
 from kubedifflib._kube import KubeObject
+from kubedifflib._diff import diff_lists, list_subtract, Difference
+from hypothesis.strategies import integers, lists, text, fixed_dictionaries, sampled_from, none, one_of
+from hypothesis import given, example
+import random
+import copy
 
 
 @given(path=text(), xs=lists(integers()))
@@ -138,14 +139,16 @@ def test_from_dict_kubernetes_obj_type(data):
     """KubeObject.from_dict parses regular kubernetes objects."""
     assert [kube_obj.data for kube_obj in KubeObject.from_dict(data)] == [data]
 
+
 @given(path=text(), kind=text())
 def test_difference_no_args(path, kind):
     """Difference.to_text works as expected when no args passed."""
     d = Difference("Message", path)
     assert d.to_text(kind) == path + ": Message"
 
+
 @given(path=text(), kind=text(), arg1=text(), arg2=one_of(text(), none()))
-@example("somepath","Secret", "foo", None)
+@example("somepath", "Secret", "foo", None)
 def test_difference_two_args(path, kind, arg1, arg2):
     """Difference.to_text works when two args passed, that may be 'none'."""
     d = Difference("Message %s %s", path, arg1, arg2)
