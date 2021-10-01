@@ -78,7 +78,6 @@ class ParseArgs():
 def main():
 
     options = ParseArgs()
-    print(options.args)
 
     printer = QuietTextPrinter()
     if options.args.json:
