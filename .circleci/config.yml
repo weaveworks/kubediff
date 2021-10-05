@@ -30,7 +30,7 @@ jobs:
         path: test-results
     # - deploy:
     #     command: |
-    #       if [ "${CIRCLE_BRANCH}" == "master" ]; then
+    #       if [ "${CIRCLE_BRANCH}" == "main" ]; then
     #         docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
     #         docker push weaveworks/kubediff:$(./tools/image-tag)
     #         docker push weaveworks/kubediff:latest
