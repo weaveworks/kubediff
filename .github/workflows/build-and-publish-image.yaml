@@ -1,0 +1,52 @@
+# We publish every merged commit in the form of an image
+# named kubediff:<branch>-<short tag>
+name: Push image of latest main
+on:
+  push:
+    branches:
+      - main
+jobs:
+  tag-scan-and-push-final-image:
+    name: "Build, scan, and publish tagged image"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Find go version
+        run: |
+          GO_VERSION=$(awk '/^go/ {print $2};' go.mod)
+          echo "::set-output name=version::${GO_VERSION}"
+        id: awk_gomod
+
+      - name: Ensure go version
+        uses: actions/setup-go@v2
+        with:
+          go-version: "${{ steps.awk_gomod.outputs.version }}"
+
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
+            virtualenv
+
+      - name: make all
+        run: |
+          mkdir -p test-results/tests
+          make JUNIT_XML=test-results/tests/junit.xml all
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Build image
+        run: |
+          make
+
+#      - name: Publish image
+#        run: |
+#          make publish-image
