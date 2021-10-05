@@ -3,8 +3,8 @@
 
 all: test lint .uptodate
 
-IMAGE_VERSION := $(shell ./tools/image-tag)
-GIT_REVISION := $(shell git rev-parse HEAD)
+DH_ORG=weaveworks
+VERSION=$(shell git symbolic-ref --short HEAD)-$(shell git rev-parse --short HEAD)
 
 # Python-specific stuff
 VIRTUALENV_DIR ?= .env
@@ -42,8 +42,8 @@ deps: $(DEPS_UPTODATE)
 $(VIRTUALENV_BIN)/flake8 $(VIRTUALENV_BIN)/py.test: $(DEPS_UPTODATE)
 
 .uptodate: prom-run Dockerfile
-	docker build --build-arg=revision=$(GIT_REVISION) -t weaveworks/kubediff .
-	docker tag weaveworks/kubediff:latest weaveworks/kubediff:$(IMAGE_VERSION)
+	docker build -t docker.io/$(DH_ORG)/kubediff .
+	docker tag docker.io/$(DH_ORG)/kubediff:latest docker.io/$(DH_ORG)/kubediff:$(VERSION)
 
 prom-run: vendor/github.com/tomwilkie/prom-run/*.go
 	CGO_ENABLED=0 GOOS=linux go build ./vendor/github.com/tomwilkie/prom-run
@@ -62,3 +62,6 @@ clean:
 clean-deps:
 	rm -rf $(VIRTUALENV_DIR)
 	rm -f $(DEPS_UPTODATE)
+
+publish-image: image
+	docker push docker.io/$(DH_ORG)/kubediff:$(VERSION)
