@@ -1,0 +1,47 @@
+# To execute this yml file use this command in your local kubernetes environment `kubectl apply -f startdeploy.yaml`
+---
+#***************************************
+#KUBEDIFF E2E START DEPLOYMENT TEST
+#***************************************
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubediff-app
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: kubediff-app
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubediff-app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: kubediff-app
+  template:
+    metadata:
+      labels:
+        app: kubediff-app
+    spec:
+      containers:
+      - command:
+        - sleep
+        - infinity
+        image: busybox
+        name: kubediff-app
+        ports:
+          - containerPort: 8080
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi

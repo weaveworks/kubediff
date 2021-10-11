@@ -1,0 +1,55 @@
+name: Kubediff End to End Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['2.7', '3.6', '3.7', '3.8', '3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install K8S ${{ matrix.k8s-version }}
+      uses: helm/kind-action@v1.2.0
+      with:
+        version: v0.11.1
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Deploy sample application with kubectl
+      run: |
+        kubectl apply -f tests/e2e
+
+    - name: Run Kubediff with initial configuration
+      run: |
+        ./kubediff tests/e2e/
+
+    - name: Change sample-app replicas to 3
+      run: |
+        kubectl scale deployment kubediff-app --replicas=3
+
+    - name: Run Kubediff after change
+      id: kubediff-nojson
+      run: |
+        ./kubediff -e tests/e2e/ | diff tests/e2e/results/nojson.txt -
+
+    - name: Run Kubediff with json flag
+      id: kubediff-json
+      run: |
+        ./kubediff -e -j tests/e2e/ | diff tests/e2e/results/json.txt -
