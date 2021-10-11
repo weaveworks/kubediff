@@ -1,0 +1,3 @@
+## default/kubediff-app (Deployment.v1.apps)
+
+.spec.replicas: '1' != '3'
