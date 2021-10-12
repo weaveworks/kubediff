@@ -1,0 +1,2 @@
+Failed to parse Kubernetes object: {'kind': 'Deployment', 'spec': {'template': {'spec': {'containers': {'image': 'busybox', 'resources': {'requests': {'cpu': '100m', 'memory': '100Mi'}, 'limits': {'cpu': '100m', 'memory': '100Mi'}}}}}}, 'metadata': {'name': 'kubediff-app'}}
+Missing key: u'apiVersion'

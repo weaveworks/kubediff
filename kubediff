@@ -5,6 +5,7 @@ from __future__ import (division, absolute_import, print_function,
                         unicode_literals)
 
 import argparse
+import logging
 import sys
 
 from kubedifflib import (
@@ -78,6 +79,7 @@ class ParseArgs():
 def main():
 
     options = ParseArgs()
+    logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)
 
     printer = QuietTextPrinter()
     if options.args.json:

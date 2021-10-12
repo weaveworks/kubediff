@@ -1,5 +1,5 @@
 {
-  "tests/e2e/k8s-deployment.yaml": [
+  "tests/e2e/success/k8s-deployment.yaml": [
     ".spec.replicas: '1' != '3'"
   ]
 }
