@@ -2,6 +2,7 @@
 
 from __future__ import (division, absolute_import, print_function,
                         unicode_literals)
+import logging
 import yaml
 import subprocess
 import os
@@ -22,7 +23,7 @@ def iter_files(paths):
         if os.path.isfile(path):
             yield path
         else:
-            for root, _dirs, filenames in os.walk(path):
+            for root, _, filenames in os.walk(path):
                 for filename in filenames:
                     yield os.path.join(root, filename)
 
@@ -44,24 +45,29 @@ class KubeObject(object):
             or decoded from a YAML config file.
         :param str namespace: the namespace to use if it's not defined in the object definition
         """
-        kind = data["kind"]
-        if kind.lower().endswith("list"):
-            for obj in data["items"]:
-                for kube_obj in KubeObject.from_dict(obj, namespace=namespace):
-                    yield kube_obj
-        else:
-            # Transform from e.g. "apps/v1" to what kubectl expects, e.g. "deployment.v1.apps"
-            # From https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get:
-            # "To use a specific API version, fully-qualify the resource,
-            # version, and group (for example: 'jobs.v1.batch/myjob')."
-            api_version_parts = data["apiVersion"].split("/")
-            api_version_parts.reverse()
-            if len(api_version_parts) < 2:
-                api_version_parts.append("")  # top-level group is blank
-            kind = kind + "." + ".".join(api_version_parts)
-            name = data["metadata"]["name"]
-            namespace = data["metadata"].get("namespace", namespace)
-            yield cls(namespace, kind, name, data)
+
+        try:
+            kind = data["kind"]
+            if kind.lower().endswith("list"):
+                for obj in data["items"]:
+                    for kube_obj in KubeObject.from_dict(obj, namespace=namespace):
+                        yield kube_obj
+            else:
+                # Transform from e.g. "apps/v1" to what kubectl expects, e.g. "deployment.v1.apps"
+                # From https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get:
+                # "To use a specific API version, fully-qualify the resource,
+                # version, and group (for example: 'jobs.v1.batch/myjob')."
+                api_version_parts = data["apiVersion"].split("/")
+                api_version_parts.reverse()
+                if len(api_version_parts) < 2:
+                    api_version_parts.append("")  # top-level group is blank
+                kind = kind + "." + ".".join(api_version_parts)
+                name = data["metadata"]["name"]
+                namespace = data["metadata"].get("namespace", namespace)
+                yield cls(namespace, kind, name, data)
+        except KeyError as e:
+            logging.error("Failed to parse Kubernetes object: {0}".format(data))
+            logging.error("Missing key: {0}".format(e))
 
     @property
     def namespaced_name(self):

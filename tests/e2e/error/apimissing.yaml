@@ -1,0 +1,16 @@
+---
+kind: Deployment
+metadata:
+  name: kubediff-app
+spec:
+  template:
+    spec:
+      containers:
+        image: busybox
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
