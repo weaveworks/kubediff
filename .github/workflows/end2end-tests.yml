@@ -15,7 +15,7 @@ jobs:
         python-version: ['2.7', '3.6', '3.7', '3.8', '3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install K8S ${{ matrix.k8s-version }}
       uses: helm/kind-action@v1.2.0
@@ -62,7 +62,7 @@ jobs:
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install K8S ${{ matrix.k8s-version }}
       uses: helm/kind-action@v1.2.0
@@ -93,7 +93,7 @@ jobs:
         python-version: ['2.7']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install K8S ${{ matrix.k8s-version }}
       uses: helm/kind-action@v1.2.0
