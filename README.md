@@ -1,4 +1,4 @@
-# Kubediff
+# DEPRECATED: Kubediff
 
 Kubediff is a tool for Kubernetes to show you the differences between your
 running configuration and your version controlled configuration.
